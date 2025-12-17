@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>El Juego de Sergio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+    <!-- Stock Modal -->
+    <div id="stock-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="close-modal">&times;</span>
+            <h2 id="modal-stock-name">Stock Name (SYM)</h2>
+            <p id="modal-stock-price" class="highlight" style="font-size:1.5rem">100 €</p>
+            <div style="background:#0f172a; padding:10px; border-radius:8px; margin:15px 0;">
+                <canvas id="modal-stock-chart" width="500" height="200" style="width:100%"></canvas>
+            </div>
+            <div class="stock-fundamentals"
+                style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; font-size:0.9rem;">
+                <div><small>Bº Por Acción (BPA)</small><br><span id="modal-stock-earnings"></span></div>
+                <div><small>Volatilidad</small><br><span id="modal-stock-volatility"></span></div>
+                <div><small>PER (Precio/Beneficio)</small><br><span id="modal-stock-per"></span></div>
+                <div><small>Tendencia</small><br><span id="modal-stock-trend"></span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Company Creation Wizard Modal -->
+    <!-- PREMIUM Company Creation Wizard (Marketing Expert Edition) -->
+    <div id="company-wizard-modal" class="modal">
+        <div class="modal-content"
+            style="max-width: 900px; padding: 0; overflow: hidden; display: flex; flex-direction: column; background: #0f172a; border: 1px solid #334155;">
+
+            <!-- Header -->
+            <div
+                style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 20px 30px; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h2 style="margin: 0; font-size: 1.5rem; color: #f8fafc;">🚀 Lanzamiento de Venture</h2>
+                    <p style="margin: 5px 0 0; color: #94a3b8; font-size: 0.9rem;">Diseña tu modelo de negocio y
+                        estrategia de mercado.</p>
+                </div>
+                <span class="close" id="close-wizard" style="position: static; color: #64748b;">&times;</span>
+            </div>
+
+            <div style="display: flex; flex: 1; min-height: 500px;">
+                <!-- Main Content Area -->
+                <div style="flex: 2; padding: 30px; overflow-y: auto;">
+
+                    <!-- Progress Tracker -->
+                    <div class="wizard-progress-new" style="display: flex; gap: 10px; margin-bottom: 30px;">
+                        <div id="wiz-step-ind-1" class="step-indicator active"
+                            style="flex: 1; height: 4px; background: #334155; border-radius: 2px; overflow: hidden;">
+                            <div style="width: 100%; height: 100%; background: var(--accent-color);"></div>
+                        </div>
+                        <div id="wiz-step-ind-2" class="step-indicator"
+                            style="flex: 1; height: 4px; background: #334155; border-radius: 2px; overflow: hidden;">
+                            <div
+                                style="width: 0%; height: 100%; background: var(--accent-color); transition: width 0.3s;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- STEP 1: MODEL & CONCEPT -->
+                    <div id="wizard-step-1" class="wizard-step active">
+                        <h3 style="color: var(--accent-color); margin-bottom: 15px;">1. Define tu Modelo de Negocio</h3>
+
+                        <div class="form-group" style="margin-bottom: 25px;">
+                            <label style="display: block; color: #cbd5e1; margin-bottom: 8px; font-weight: 500;">Nombre
+                                Comercial</label>
+                            <input type="text" id="wiz-name" placeholder="Ej. Nexus Innovations, Café Altura..."
+                                style="width: 100%; background: #1e293b; border: 1px solid #475569; padding: 12px; color: white; border-radius: 8px; font-size: 1rem; outline: none; transition: border-color 0.2s;">
+                        </div>
+
+                        <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 15px;">Selecciona tu vehículo de
+                            inversión:</p>
+                        <div id="wiz-types-grid" class="wiz-cards-grid">
+                            <!-- Injected JS -->
+                        </div>
+                    </div>
+
+                    <!-- STEP 2: LOCATION STRATEGY -->
+                    <div id="wizard-step-2" class="wizard-step">
+                        <h3 style="color: var(--accent-color); margin-bottom: 15px;">2. Estrategia de Ubicación (HQ)
+                        </h3>
+                        <p style="color: #94a3b8; margin-bottom: 20px;">Elige donde establecer tu sede. El tráfico
+                            determina tu techo de ingresos inicial.</p>
+
+                        <div id="wiz-loc-grid" class="wiz-cards-grid loc-grid">
+                            <!-- Injected JS -->
+                        </div>
+                    </div>
+
+                    <!-- MOBILE NAVIGATION BUTTONS - Only visible on mobile -->
+                    <div id="mobile-wiz-buttons" style="display: none; margin-top: 20px; gap: 10px;">
+                        <button id="btn-wiz-back-mobile"
+                            style="flex: 1; padding: 16px; background: transparent; border: 1px solid #475569; color: #94a3b8; border-radius: 6px; cursor: pointer; font-size: 1rem; font-weight: bold; min-height: 54px;">
+                            ← Atrás
+                        </button>
+                        <button id="btn-wiz-next-mobile" class="btn-primary"
+                            style="flex: 2; padding: 16px; background: var(--accent-color); color: #0f172a; font-weight: bold; border-radius: 6px; border: none; cursor: pointer; font-size: 1rem; min-height: 54px;">
+                            Siguiente ➡️
+                        </button>
+                    </div>
+
+                </div>
+
+                <!-- Sidebar: Investment Summary -->
+                <div
+                    style="flex: 1; background: #1e293b; border-left: 1px solid #334155; padding: 30px; display: flex; flex-direction: column;">
+                    <h4
+                        style="color: #cbd5e1; margin-top: 0; margin-bottom: 20px; font-size: 1rem; text-transform: uppercase; letter-spacing: 1px;">
+                        Resumen de Capital</h4>
+
+                    <div class="summary-item" style="margin-bottom: 20px;">
+                        <span style="display: block; color: #64748b; font-size: 0.85rem; margin-bottom: 5px;">Capital
+                            Disponible</span>
+                        <strong id="wiz-current-cash" style="font-size: 1.4rem; color: #f8fafc;">0 €</strong>
+                    </div>
+
+                    <div style="flex: 1;">
+                        <div class="cost-breakdown"
+                            style="background: rgba(15, 23, 42, 0.5); padding: 15px; border-radius: 8px; border: 1px dashed #475569;">
+                            <div
+                                style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem;">
+                                <span style="color: #94a3b8;">Licencia / Setup</span>
+                                <span id="summ-setup-cost" style="color: #f8fafc;">0 €</span>
+                            </div>
+                            <div
+                                style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem;">
+                                <span style="color: #94a3b8;">Alquiler (Mes 1)</span>
+                                <span id="summ-rent-cost" style="color: #f8fafc;">0 €</span>
+                            </div>
+                            <div style="height: 1px; background: #475569; margin: 10px 0;"></div>
+                            <div style="display: flex; justify-content: space-between; font-weight: bold;">
+                                <span style="color: var(--danger-color);">Inversión Total</span>
+                                <span id="wiz-total-cost" style="color: var(--danger-color);">0 €</span>
+                            </div>
+                        </div>
+                        <div id="wiz-error-msg"
+                            style="margin-top: 15px; color: var(--danger-color); font-size: 0.85rem; display: none;">
+                            ⚠️ Capital insuficiente para esta operación.
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 10px; margin-top: 20px;">
+                        <button id="btn-wiz-back"
+                            style="flex: 1; padding: 12px; background: transparent; border: 1px solid #475569; color: #94a3b8; border-radius: 6px; cursor: pointer; display: none;">Atrás</button>
+                        <button id="btn-wiz-next" class="btn-primary"
+                            style="flex: 2; padding: 12px; background: var(--accent-color); color: #0f172a; font-weight: bold; border-radius: 6px; border: none; cursor: pointer;">Siguiente
+                            ➡️</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="app">
+        <!-- Game Title -->
+        <h1
+            style="text-align:center; margin:0; padding:15px; background:#0f172a; color:#facc15; font-size:1.5rem; text-transform:uppercase; letter-spacing:2px; border-bottom:1px solid #334155;">
+            El Juego de Sergio
+        </h1>
+        <header class="app-header"
+            style="display:grid; grid-template-columns: 1fr auto 1fr; align-items:center; padding: 10px 20px; background:#0f172a; border-bottom:1px solid #334155; gap:20px;">
+
+            <!-- LEFT: Profile & Actions -->
+            <div class="header-left" style="display:flex; align-items:center; gap:15px;">
+                <div id="player-profile-display"
+                    onclick="document.querySelector('.nav-btn[data-view=&quot;dashboard&quot;]').click()"
+                    style="display:flex; align-items:center; gap:8px; background:#1e293b; padding:5px 12px; border-radius:20px; border:1px solid #334155; cursor:pointer; transition:background 0.2s;"
+                    onmouseover="this.style.background='#334155'" onmouseout="this.style.background='#1e293b'">
+                    <span style="font-size:1.2rem;">🏠</span>
+                    <span id="header-player-name"
+                        style="color:#fcd34d; font-weight:bold; font-size:0.9rem;">Jugador</span>
+                </div>
+                <button onclick="alert(PersistenceModule.saveGame().message)" class="btn-save-game"
+                    style="background:linear-gradient(135deg, #10b981, #059669); border:none; color:white; padding:6px 15px; border-radius:20px; cursor:pointer; font-size:0.85rem; font-weight:600; box-shadow:0 2px 5px rgba(16, 185, 129, 0.3); display:flex; align-items:center; gap:5px; transition:transform 0.1s;">
+                    <span>💾</span>Guardar
+                </button>
+            </div>
+
+            <!-- CENTER: Next Turn -->
+            <div class="header-center" style="display:flex; justify-content:center;">
+                <button id="next-turn-btn"
+                    style="background:linear-gradient(135deg, #3b82f6, #2563eb); color:white; border:none; padding:10px 30px; border-radius:8px; font-weight:bold; font-size:1rem; cursor:pointer; box-shadow:0 4px 10px rgba(59, 130, 246, 0.4); transition:transform 0.2s;">
+                    Siguiente Mes ➡️
+                </button>
+            </div>
+
+            <!-- RIGHT: Stats -->
+            <div class="header-right" style="display:flex; justify-content:flex-end; gap:10px;">
+                <div style="text-align:right;">
+                    <div id="money-display"
+                        style="font-size:1.2rem; font-weight:bold; color:#4ade80; font-family:monospace;">10.000 €
+                    </div>
+                    <div id="date-display" style="font-size:0.8rem; color:#94a3b8;">Mes 1, Año 1</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- MOBILE BOTTOM NAV -->
+        <nav id="bottom-nav">
+            <button class="b-nav-item" data-view="education">
+                <span class="icon">🎓</span>
+                <span class="label">Formación</span>
+            </button>
+            <button class="b-nav-item" data-view="lifestyle">
+                <span class="icon">💸</span>
+                <span class="label">Gastos</span>
+            </button>
+            <button class="b-nav-item" data-view="job">
+                <span class="icon">💼</span>
+                <span class="label">Trabajo</span>
+            </button>
+            <button class="b-nav-item" data-view="bank">
+                <span class="icon">🏦</span>
+                <span class="label">Banco</span>
+            </button>
+            <button class="b-nav-item" data-view="real-estate">
+                <span class="icon">🏘️</span>
+                <span class="label">Inmuebles</span>
+            </button>
+            <button class="b-nav-item" data-view="market">
+                <span class="icon">📈</span>
+                <span class="label">Bolsa</span>
+            </button>
+        </nav>
+
+        <main>
+            <nav id="main-nav" class="desktop-nav" style="display:flex; align-items:center; gap:5px; padding-right:0;">
+                <button class="nav-btn active" data-view="dashboard">Resumen</button>
+                <button class="nav-btn" data-view="education">Formación</button>
+                <button class="nav-btn" data-view="lifestyle">Gastos</button>
+                <button class="nav-btn" data-view="job">Empleo</button>
+                <button class="nav-btn" data-view="bank">Banco</button>
+                <button class="nav-btn" data-view="real-estate">Inmobiliaria</button>
+                <button class="nav-btn" data-view="market">Bolsa</button>
+            </nav>
+
+            <section id="view-container">
+                <!-- Views will be rendered here -->
+                <div id="dashboard-view" class="view active">
+                    <h2>Resumen Financiero</h2>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <h3>Patrimonio Neto</h3>
+                            <p id="net-worth">1,000 €</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Ingresos Mensuales</h3>
+                            <p id="monthly-income">0 €</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Gastos Mensuales</h3>
+                            <p id="monthly-expenses">0 €</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Edad</h3>
+                            <p id="age-display">18 años</p>
+                        </div>
+                    </div>
+
+                    <div class="chart-container"
+                        style="margin-top: 30px; background: var(--card-bg); padding: 15px; border-radius: 12px; border: 1px solid #334155;">
+                        <h3>Evolución Patrimonio</h3>
+                        <canvas id="net-worth-chart" width="800" height="300"
+                            style="width: 100%; height: auto;"></canvas>
+                    </div>
+
+                    <button id="next-turn-btn"
+                        style="margin-top: 30px; width: 100%; padding: 15px; background: linear-gradient(135deg, #38bdf8, #0ea5e9); border: none; border-radius: 8px; color: white; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: transform 0.1s;">
+                        Siguiente Mes ▶
+                    </button>
+                </div>
+
+                <div id="market-view" class="view">
+                    <h2>Mercado de Valores</h2>
+                    <div class="market-container">
+                        <div class="stocks-list">
+                            <h3>Acciones Disponibles</h3>
+                            <div id="stocks-grid" class="stocks-grid">
+                                <!-- Stock Items injected here -->
+                            </div>
+                        </div>
+
+                        <div class="portfolio-panel">
+                            <h3>Tu Portafolio</h3>
+                            <div id="portfolio-list">
+                                <p class="empty-msg">No tienes inversiones todavía.</p>
+                            </div>
+
+                            <div class="trade-panel">
+                                <h3>Operar</h3>
+                                <div class="trade-controls">
+                                    <select id="stock-select"></select>
+                                    <input type="number" id="trade-amount" placeholder="Cantidad" min="1" value="1">
+                                    <div class="trade-actions">
+                                        <button id="btn-buy" class="btn-success">Comprar</button>
+                                        <button id="btn-sell" class="btn-danger">Vender</button>
+                                    </div>
+                                    <p id="trade-feedback"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="bank-view" class="view">
+                    <h2>Banco Central</h2>
+                    <div class="bank-container">
+                        <div class="loans-panel">
+                            <h3>Mis Préstamos</h3>
+                            <div id="active-loans-list">
+                                <!-- Loans injected here -->
+                            </div>
+                        </div>
+
+                        <div class="new-loan-panel">
+                            <h3>Solicitar Préstamo Personal</h3>
+                            <div class="loan-calculator">
+                                <p>Límite estimado: <span id="loan-limit" class="highlight">0 €</span></p>
+                                <div class="form-group">
+                                    <label>Cantidad:</label>
+                                    <input type="number" id="loan-amount" placeholder="Ej. 5000">
+                                </div>
+                                <div class="form-group">
+                                    <label>Plazo (Años):</label>
+                                    <input type="range" id="loan-years" min="1" max="5" value="2">
+                                    <span id="loan-years-display">2 años</span>
+                                </div>
+                                <div class="loan-summary">
+                                    <p>Interés: <span class="highlight">12%</span></p>
+                                    <p>Cuota estimada: <span id="loan-monthly-payment">0 €</span></p>
+                                </div>
+                                <button id="btn-request-loan" class="btn-primary">Solicitar Dinero</button>
+                                <p id="bank-feedback"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="real-estate-view" class="view">
+                    <h2>Bienes Inmobiliarios</h2>
+                    <div class="re-container">
+                        <div class="listings-panel">
+                            <h3>Oportunidades de Mercado</h3>
+                            <div id="property-listings" class="listings-grid">
+                                <!-- Properties injected here -->
+                            </div>
+                        </div>
+
+                        <div class="my-properties-panel">
+                            <h3>Mis Propiedades</h3>
+                            <div id="my-properties-list">
+                                <p class="empty-msg">No tienes propiedades.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="job-view" class="view">
+                    <h2>Carrera Profesional</h2>
+                    <div class="job-container">
+                        <div class="current-job-panel">
+                            <h3>Puesto Actual</h3>
+                            <div class="job-card main-job">
+                                <h4 id="job-title-display">Reponedor</h4>
+                                <p class="job-salary">Salario: <span id="job-salary-display">1,100 €</span>/mes</p>
+                                <p class="job-exp">Experiencia acumulada: <span id="job-exp-display">0</span> meses
+                                </p>
+                            </div>
+
+                            <div id="promotion-section" class="promotion-area">
+                                <h4>Próximo Ascenso Interno</h4>
+                                <p id="next-job-info">Cargando...</p>
+                                <button id="btn-promote" class="btn-primary" disabled>Solicitar Ascenso</button>
+                            </div>
+                        </div>
+
+                        <!-- NEW: Job Market -->
+                        <div class="job-market-panel"
+                            style="margin-top: 20px; border-top: 1px solid #334155; padding-top: 20px;">
+                            <h3>Mercado Laboral (Otras Vacantes)</h3>
+                            <div id="job-market-list" class="listings-grid">
+                                <!-- Job Offers injected here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="education-view" class="view">
+                    <h2>Formación y Estudios</h2>
+                    <div class="education-container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="current-edu-panel">
+                            <h3>Tu Formación</h3>
+                            <div id="current-education-list">
+                                <!-- List injected here -->
+                                <div class="edu-item">Bachillerato</div>
+                            </div>
+                        </div>
+                        <div class="courses-panel">
+                            <h3>Cursos Disponibles</h3>
+                            <div id="courses-list" class="listings-grid">
+                                <!-- Courses injected here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LIFESTYLE VIEW -->
+                <div id="lifestyle-view" class="view">
+                    <!-- Content injected by UI.updateLifestyle -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Game Logic -->
+    <script src="js/game.js"></script>
+</body>
+
+</html>
