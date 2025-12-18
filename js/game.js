@@ -394,41 +394,209 @@ var ChartModule = {
  * PERSISTENCE MODULE
  *******************************************************/
 var PersistenceModule = {
-    SAVE_KEY: 'inversion_game_v1',
+    SAVE_KEY_AUTO: 'inversion_game_auto',
+    SAVE_KEY_SLOT1: 'inversion_game_slot1',
+    SAVE_KEY_SLOT2: 'inversion_game_slot2',
+    SAVE_KEY: 'inversion_game_auto', // Default for backwards compatibility
 
-    saveGame() {
+    // Get all available saves
+    getAllSaves() {
+        const saves = [];
+        const keys = [
+            { key: this.SAVE_KEY_AUTO, name: 'Auto-Guardado', isAuto: true },
+            { key: this.SAVE_KEY_SLOT1, name: 'Slot 1', isAuto: false },
+            { key: this.SAVE_KEY_SLOT2, name: 'Slot 2', isAuto: false }
+        ];
+
+        keys.forEach(slot => {
+            const data = localStorage.getItem(slot.key);
+            if (data) {
+                try {
+                    const parsed = JSON.parse(data);
+                    saves.push({
+                        key: slot.key,
+                        name: slot.name,
+                        isAuto: slot.isAuto,
+                        data: parsed,
+                        playerName: parsed.playerName || 'Desconocido',
+                        cash: parsed.cash || 0,
+                        year: parsed.year || 1,
+                        month: parsed.month || 1,
+                        savedAt: parsed.savedAt || null
+                    });
+                } catch (e) {
+                    console.error('Error parsing save:', slot.key, e);
+                }
+            }
+        });
+
+        return saves;
+    },
+
+    // Save to specific slot
+    saveToSlot(slotKey) {
         try {
-            const data = JSON.stringify(GameState);
-            localStorage.setItem(this.SAVE_KEY, data);
+            const dataToSave = { ...GameState, savedAt: new Date().toISOString() };
+            const data = JSON.stringify(dataToSave);
+            localStorage.setItem(slotKey, data);
             return { success: true, message: 'Partida guardada correctamente.' };
         } catch (e) {
             return { success: false, message: 'Error al guardar: ' + e.message };
         }
     },
 
-    loadGame() {
+    // Load from specific slot
+    loadFromSlot(slotKey) {
         try {
-            const data = localStorage.getItem(this.SAVE_KEY);
-            if (!data) return { success: false, message: 'No hay partida guardada.' };
+            const data = localStorage.getItem(slotKey);
+            if (!data) return { success: false, message: 'No hay partida en este slot.' };
             const loadedState = JSON.parse(data);
-
-            // Merge logic to avoid breaking references if needed, but complete replace is cleaner for this scale
             Object.assign(GameState, loadedState);
-
-            // Re-instantiate complex objects if they were lost (Dates, etc) - none here currently
             return { success: true, message: `Bienvenido de nuevo, ${GameState.playerName}` };
         } catch (e) {
             return { success: false, message: 'Error al cargar: ' + e.message };
         }
     },
 
-    checkSave() {
-        return !!localStorage.getItem(this.SAVE_KEY);
+    // Auto-save (used by the game loop)
+    saveGame() {
+        return this.saveToSlot(this.SAVE_KEY_AUTO);
     },
 
-    resetGame(name) {
-        localStorage.removeItem(this.SAVE_KEY);
-        location.reload(); // Simplest way to reset state
+    // Load from auto-save (backwards compatibility)
+    loadGame() {
+        return this.loadFromSlot(this.SAVE_KEY_AUTO);
+    },
+
+    // Check if any save exists
+    checkSave() {
+        return this.getAllSaves().length > 0;
+    },
+
+    // Delete a specific slot
+    deleteSlot(slotKey) {
+        localStorage.removeItem(slotKey);
+    },
+
+    // Clear all saves
+    resetGame() {
+        localStorage.removeItem(this.SAVE_KEY_AUTO);
+        localStorage.removeItem(this.SAVE_KEY_SLOT1);
+        localStorage.removeItem(this.SAVE_KEY_SLOT2);
+        location.reload();
+    },
+
+    // Show save slots modal for manual saving
+    showSaveModal() {
+        const saves = this.getAllSaves();
+        const slot1 = saves.find(s => s.key === this.SAVE_KEY_SLOT1);
+        const slot2 = saves.find(s => s.key === this.SAVE_KEY_SLOT2);
+
+        const formatSlot = (slot, key, name) => {
+            if (slot) {
+                return `
+                    <div class="save-slot-card" data-key="${key}">
+                        <div class="slot-header">
+                            <span class="slot-name">${name}</span>
+                            <span class="slot-date">${slot.savedAt ? new Date(slot.savedAt).toLocaleString('es-ES') : 'Sin fecha'}</span>
+                        </div>
+                        <div class="slot-info">
+                            <span>🎮 ${slot.playerName}</span>
+                            <span>💰 ${formatCurrency(slot.cash)}</span>
+                            <span>📅 Año ${slot.year}, Mes ${slot.month}</span>
+                        </div>
+                        <button class="btn-save-slot" onclick="PersistenceModule.confirmSaveToSlot('${key}')">💾 Sobrescribir</button>
+                    </div>
+                `;
+            } else {
+                return `
+                    <div class="save-slot-card empty" data-key="${key}">
+                        <div class="slot-header">
+                            <span class="slot-name">${name}</span>
+                            <span class="slot-empty">Vacío</span>
+                        </div>
+                        <button class="btn-save-slot" onclick="PersistenceModule.saveAndNotify('${key}')">💾 Guardar Aquí</button>
+                    </div>
+                `;
+            }
+        };
+
+        const msg = `
+            <style>
+                .save-slots-container { padding: 10px 0; }
+                .save-slot-card {
+                    background: rgba(15, 23, 42, 0.8);
+                    border: 1px solid #334155;
+                    border-radius: 12px;
+                    padding: 15px;
+                    margin-bottom: 12px;
+                }
+                .save-slot-card.empty {
+                    border-style: dashed;
+                    opacity: 0.7;
+                }
+                .slot-header {
+                    display: flex;
+                    justify-content: space-between;
+                    margin-bottom: 10px;
+                }
+                .slot-name {
+                    font-weight: 700;
+                    color: #38bdf8;
+                }
+                .slot-date {
+                    font-size: 0.8rem;
+                    color: #94a3b8;
+                }
+                .slot-empty {
+                    font-size: 0.8rem;
+                    color: #64748b;
+                    font-style: italic;
+                }
+                .slot-info {
+                    display: flex;
+                    gap: 15px;
+                    font-size: 0.85rem;
+                    color: #e2e8f0;
+                    margin-bottom: 12px;
+                    flex-wrap: wrap;
+                }
+                .btn-save-slot {
+                    width: 100%;
+                    padding: 10px;
+                    background: linear-gradient(135deg, #10b981, #059669);
+                    border: none;
+                    border-radius: 8px;
+                    color: white;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: transform 0.1s;
+                }
+                .btn-save-slot:hover {
+                    transform: scale(1.02);
+                }
+            </style>
+            <div class="save-slots-container">
+                ${formatSlot(slot1, this.SAVE_KEY_SLOT1, 'Slot 1')}
+                ${formatSlot(slot2, this.SAVE_KEY_SLOT2, 'Slot 2')}
+            </div>
+        `;
+
+        UI.showModal('💾 Guardar Partida', msg, [
+            { text: 'Cerrar', style: 'secondary', fn: null }
+        ]);
+    },
+
+    confirmSaveToSlot(slotKey) {
+        if (confirm('¿Sobrescribir esta partida guardada?')) {
+            this.saveAndNotify(slotKey);
+        }
+    },
+
+    saveAndNotify(slotKey) {
+        const result = this.saveToSlot(slotKey);
+        document.querySelector('.custom-modal-overlay')?.remove();
+        UI.showToast(result.success ? '✅ Guardado' : '❌ Error', result.message, result.success ? 'success' : 'error');
     }
 };
 
@@ -1272,7 +1440,6 @@ var EducationModule = {
 
         let message = `
                     <style>
-                        .custom-modal-footer, .modal-actions { display: none !important; }
                         /* HACK: Tighten spacing for Course Completion modal */
                         .custom-modal-box h3 { margin-bottom: 5px !important; padding-bottom: 0 !important; }
                         .custom-modal-box .modal-body { padding-top: 5px !important; }
@@ -5933,175 +6100,75 @@ try {
 
     // STARTUP LOGIC
     if (PersistenceModule.checkSave()) {
-        const savedState = JSON.parse(localStorage.getItem(PersistenceModule.SAVE_KEY));
+        const allSaves = PersistenceModule.getAllSaves();
+
+        const renderSaveSlot = (save) => {
+            const dateStr = save.savedAt ? new Date(save.savedAt).toLocaleString('es-ES', {
+                day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
+            }) : '';
+            return `
+                <div class="load-slot-card" data-key="${save.key}">
+                    <div class="slot-badge ${save.isAuto ? 'auto' : 'manual'}">${save.isAuto ? '🔄 Auto' : '💾'}</div>
+                    <div class="slot-player">🎮 ${save.playerName}</div>
+                    <div class="slot-details">
+                        <span class="slot-money">💰 ${formatCurrency(save.cash)}</span>
+                        <span>📅 Año ${save.year}, Mes ${save.month}</span>
+                    </div>
+                    ${dateStr ? `<div class="slot-date">⏰ ${dateStr}</div>` : ''}
+                    <button class="btn-load-slot" data-key="${save.key}">▶️ Cargar</button>
+                </div>
+            `;
+        };
+
         const msg = `
             <style>
                 .custom-modal-box h3 { display: none !important; }
                 .custom-modal-box .modal-body { padding: 0 !important; }
-                .custom-modal-box { 
-                    max-width: 420px !important; 
-                    border-radius: 24px !important;
-                    overflow: hidden !important;
-                    border: 1px solid #334155 !important;
-                }
-                .welcome-back-container {
-                    padding: 30px;
-                    text-align: center;
-                    background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
-                    border-radius: 24px;
-                }
-                .welcome-icon {
-                    font-size: 4rem;
-                    margin-bottom: 15px;
-                    display: block;
-                    animation: pulse 2s ease-in-out infinite;
-                }
-                @keyframes pulse {
-                    0%, 100% { transform: scale(1); }
-                    50% { transform: scale(1.1); }
-                }
-                .welcome-title {
-                    color: #38bdf8;
-                    margin: 0 0 20px 0;
-                    font-size: 1.5rem;
-                    font-weight: 700;
-                }
-                .save-info-card {
-                    background: rgba(56, 189, 248, 0.1);
-                    border: 1px solid rgba(56, 189, 248, 0.2);
-                    border-radius: 16px;
-                    padding: 20px;
-                    margin-bottom: 25px;
-                }
-                .player-name {
-                    font-size: 1.3rem;
-                    font-weight: 700;
-                    color: #fbbf24;
-                    margin-bottom: 15px;
-                }
-                .save-stats {
-                    display: grid;
-                    grid-template-columns: 1fr 1fr;
-                    gap: 10px;
-                }
-                .stat-item {
-                    background: rgba(15, 23, 42, 0.5);
-                    padding: 12px;
-                    border-radius: 10px;
-                }
-                .stat-item .label {
-                    font-size: 0.75rem;
-                    color: #94a3b8;
-                    text-transform: uppercase;
-                    letter-spacing: 0.5px;
-                }
-                .stat-item .value {
-                    font-size: 1.1rem;
-                    font-weight: 700;
-                    color: #4ade80;
-                    margin-top: 4px;
-                }
-                .stat-item .value.date {
-                    color: #e2e8f0;
-                }
-                .welcome-actions {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 12px;
-                }
-                .btn-continue {
-                    width: 100%;
-                    padding: 16px;
-                    font-size: 1.1rem;
-                    font-weight: 700;
-                    border-radius: 12px;
-                    border: none;
-                    cursor: pointer;
-                    background: linear-gradient(135deg, #4ade80, #22c55e);
-                    color: #0f172a;
-                    transition: transform 0.1s, box-shadow 0.2s;
-                    box-shadow: 0 4px 15px rgba(74, 222, 128, 0.3);
-                }
-                .btn-continue:hover {
-                    transform: translateY(-2px);
-                    box-shadow: 0 6px 20px rgba(74, 222, 128, 0.4);
-                }
-                .btn-new-game {
-                    width: 100%;
-                    padding: 14px;
-                    font-size: 1rem;
-                    font-weight: 600;
-                    border-radius: 12px;
-                    border: 2px solid #475569;
-                    cursor: pointer;
-                    background: transparent;
-                    color: #94a3b8;
-                    transition: all 0.2s;
-                }
-                .btn-new-game:hover {
-                    border-color: #f87171;
-                    color: #f87171;
-                }
-                @media (max-width: 480px) {
-                    .custom-modal-box {
-                        margin: 10px !important;
-                    }
-                    .welcome-back-container {
-                        padding: 25px 20px;
-                    }
-                    .welcome-icon {
-                        font-size: 3rem;
-                    }
-                    .welcome-title {
-                        font-size: 1.3rem;
-                    }
-                    .save-stats {
-                        grid-template-columns: 1fr;
-                    }
-                }
+                .custom-modal-box { max-width: 440px !important; border-radius: 24px !important; overflow: hidden !important; border: 1px solid #334155 !important; }
+                .welcome-back-container { padding: 25px; text-align: center; background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%); border-radius: 24px; max-height: 80vh; overflow-y: auto; }
+                .welcome-icon { font-size: 3rem; margin-bottom: 10px; display: block; animation: pulse 2s ease-in-out infinite; }
+                @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+                .welcome-title { color: #38bdf8; margin: 0 0 5px; font-size: 1.3rem; font-weight: 700; }
+                .welcome-subtitle { color: #94a3b8; font-size: 0.85rem; margin-bottom: 15px; }
+                .saves-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
+                .load-slot-card { background: rgba(30, 41, 59, 0.8); border: 1px solid #334155; border-radius: 12px; padding: 12px; text-align: left; position: relative; transition: border-color 0.2s; }
+                .load-slot-card:hover { border-color: #38bdf8; }
+                .slot-badge { position: absolute; top: -6px; right: 10px; background: #1e293b; padding: 2px 8px; border-radius: 8px; font-size: 0.65rem; font-weight: 600; }
+                .slot-badge.auto { color: #4ade80; border: 1px solid #4ade80; }
+                .slot-badge.manual { color: #38bdf8; border: 1px solid #38bdf8; }
+                .slot-player { font-size: 1rem; font-weight: 700; color: #fbbf24; margin-bottom: 5px; }
+                .slot-details { display: flex; gap: 12px; font-size: 0.8rem; color: #e2e8f0; margin-bottom: 4px; flex-wrap: wrap; }
+                .slot-money { color: #4ade80; font-weight: 600; }
+                .slot-date { font-size: 0.7rem; color: #64748b; margin-bottom: 8px; }
+                .btn-load-slot { width: 100%; padding: 8px; background: linear-gradient(135deg, #4ade80, #22c55e); border: none; border-radius: 6px; color: #0f172a; font-weight: 700; cursor: pointer; font-size: 0.85rem; }
+                .btn-load-slot:hover { transform: scale(1.02); }
+                .btn-new-game { width: 100%; padding: 12px; font-size: 0.95rem; font-weight: 600; border-radius: 10px; border: 2px solid #475569; cursor: pointer; background: transparent; color: #94a3b8; transition: all 0.2s; }
+                .btn-new-game:hover { border-color: #f87171; color: #f87171; }
+                @media (max-width: 480px) { .welcome-back-container { padding: 20px 15px; } .welcome-icon { font-size: 2.5rem; } }
             </style>
             <div class="welcome-back-container">
                 <span class="welcome-icon">👋</span>
                 <h2 class="welcome-title">¡Bienvenido de nuevo!</h2>
-                
-                <div class="save-info-card">
-                    <div class="player-name">🎮 ${savedState.playerName || 'Jugador'}</div>
-                    <div class="save-stats">
-                        <div class="stat-item">
-                            <div class="label">Dinero</div>
-                            <div class="value">${formatCurrency(savedState.cash)}</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="label">Progreso</div>
-                            <div class="value date">Año ${savedState.year}, Mes ${savedState.month}</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="welcome-actions">
-                    <button id="btn-continue-saved" class="btn-continue">
-                        ▶️ Continuar Partida
-                    </button>
-                    <button id="btn-new-game-saved" class="btn-new-game">
-                        🔄 Nueva Partida
-                    </button>
-                </div>
+                <p class="welcome-subtitle">Selecciona una partida</p>
+                <div class="saves-list">${allSaves.map(renderSaveSlot).join('')}</div>
+                <button id="btn-new-game-saved" class="btn-new-game">🔄 Nueva Partida</button>
             </div>
         `;
 
         UI.showModal('Bienvenido de nuevo', msg, [], true);
 
-        // Attach handlers after modal is created
-        document.getElementById('btn-continue-saved').onclick = () => {
-            document.querySelector('.custom-modal-overlay').remove();
-            PersistenceModule.loadGame();
-            initGame();
-        };
+        document.querySelectorAll('.btn-load-slot').forEach(btn => {
+            btn.onclick = () => {
+                const key = btn.dataset.key;
+                document.querySelector('.custom-modal-overlay').remove();
+                PersistenceModule.loadFromSlot(key);
+                initGame();
+            };
+        });
 
         document.getElementById('btn-new-game-saved').onclick = () => {
-            if (confirm('¿Seguro? Se borrará el progreso actual.')) {
+            if (confirm('¿Iniciar nueva partida?')) {
                 document.querySelector('.custom-modal-overlay').remove();
-                localStorage.removeItem(PersistenceModule.SAVE_KEY);
                 promptNewUser(initGame);
             }
         };
