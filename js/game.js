@@ -3034,68 +3034,107 @@ var UI = {
         const limit = BankModule.getMaxLoanAmount();
         const loans = GameState.loans;
 
+        // Calculate total debt
+        let totalDebt = 0;
+        let totalMonthlyPayment = 0;
+        loans.forEach(l => {
+            totalDebt += l.remainingBalance;
+            totalMonthlyPayment += l.monthlyPayment;
+        });
+
         // RENDER
         container.innerHTML = `
                     <div class="dashboard-container">
                          <div class="section-header">
                             <h2>Banco Central</h2>
-                            <span style="color:#94a3b8; font-size:0.9rem;">Límite Crédito: ${formatCurrency(limit)}</span>
+                            <span style="color:#94a3b8; font-size:0.9rem;">Servicios Financieros</span>
+                        </div>
+
+                        <!-- BANK HERO STATS -->
+                        <div class="bank-stats-container" style="display:flex; flex-wrap:wrap; gap:15px; margin-bottom:25px;">
+                            <div class="bank-stat-card" style="flex:1; min-width: 140px; background: linear-gradient(145deg, rgba(74, 222, 128, 0.1), rgba(34, 197, 94, 0.05)); border: 1px solid rgba(74, 222, 128, 0.3); border-radius: 16px; padding: 20px; text-align: center;">
+                                <div style="font-size: 2rem; margin-bottom: 8px; filter: drop-shadow(0 0 10px rgba(74, 222, 128, 0.4));">💳</div>
+                                <span style="display:block; color:#94a3b8; font-size:0.7rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom:8px;">Límite Crédito</span>
+                                <span style="font-size:1.3rem; font-weight:800; color:#4ade80; text-shadow: 0 0 15px rgba(74, 222, 128, 0.3);">${formatCurrency(limit)}</span>
+                            </div>
+                            <div class="bank-stat-card" style="flex:1; min-width: 140px; background: linear-gradient(145deg, rgba(248, 113, 113, 0.1), rgba(239, 68, 68, 0.05)); border: 1px solid rgba(248, 113, 113, 0.3); border-radius: 16px; padding: 20px; text-align: center;">
+                                <div style="font-size: 2rem; margin-bottom: 8px; filter: drop-shadow(0 0 10px rgba(248, 113, 113, 0.4));">📊</div>
+                                <span style="display:block; color:#94a3b8; font-size:0.7rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom:8px;">Deuda Total</span>
+                                <span style="font-size:1.3rem; font-weight:800; color:#f87171; text-shadow: 0 0 15px rgba(248, 113, 113, 0.3);">-${formatCurrency(totalDebt)}</span>
+                            </div>
+                            <div class="bank-stat-card" style="flex:1; min-width: 140px; background: linear-gradient(145deg, rgba(250, 204, 21, 0.1), rgba(251, 191, 36, 0.05)); border: 1px solid rgba(250, 204, 21, 0.3); border-radius: 16px; padding: 20px; text-align: center;">
+                                <div style="font-size: 2rem; margin-bottom: 8px; filter: drop-shadow(0 0 10px rgba(250, 204, 21, 0.4));">💸</div>
+                                <span style="display:block; color:#94a3b8; font-size:0.7rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom:8px;">Pago Mensual</span>
+                                <span style="font-size:1.3rem; font-weight:800; color:#facc15; text-shadow: 0 0 15px rgba(250, 204, 21, 0.3);">-${formatCurrency(totalMonthlyPayment)}</span>
+                            </div>
                         </div>
 
                         <div class="bank-grid">
                             <!-- LEFT: CALCULATOR -->
                             <div class="calculator-card">
-                                <h3 style="margin-top:0; color:#facc15; border-bottom:1px solid #334155; padding-bottom:10px; margin-bottom:20px;">💰 Solicitar Financiación</h3>
+                                <h3 style="margin-top:0; color:#facc15; border-bottom:1px solid rgba(250, 204, 21, 0.2); padding-bottom:15px; margin-bottom:25px; font-size: 1.2rem; display: flex; align-items: center; gap: 10px;">
+                                    <span style="font-size: 1.5rem;">🏦</span> Solicitar Financiación
+                                </h3>
                                 
                                 <div class="loan-input-group">
                                     <label>Cantidad a solicitar (€)</label>
                                     <input type="number" id="loan-amount-input" class="loan-input" placeholder="Ej. 50000" min="1000" step="1000">
                                 </div>
                                 <div class="loan-input-group">
-                                    <label>Plazo de Amortización: <span id="loan-years-val" style="color:white; font-weight:bold;">2 años</span></label>
-                                    <input type="range" id="loan-years-input" min="1" max="5" value="2" style="width:100%; accent-color:#facc15;">
+                                    <label>Plazo: <span id="loan-years-val" style="color:#facc15; font-weight:bold;">2 años</span></label>
+                                    <input type="range" id="loan-years-input" min="1" max="5" value="2" style="width:100%; accent-color:#facc15; height: 8px;">
                                 </div>
 
                                 <div class="loan-summary">
-                                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                                        <span>Tipo de Interés</span>
-                                        <span style="color:#f87171; font-weight:bold;">12.0% TAE</span>
+                                    <div style="display:flex; justify-content:space-between; margin-bottom:12px; align-items: center;">
+                                        <span style="color: #94a3b8; font-size: 0.9rem;">🔴 Tipo de Interés</span>
+                                        <span style="color:#f87171; font-weight:700; font-size: 1.1rem;">12.0% TAE</span>
                                     </div>
-                                    <div style="display:flex; justify-content:space-between; font-size:1.1rem; border-top:1px solid #334155; padding-top:5px; margin-top:5px;">
-                                        <span>Cuota Mensual</span>
-                                        <span id="loan-monthly-preview" style="color:#facc15; font-weight:bold;">0,00 €</span>
+                                    <div style="display:flex; justify-content:space-between; font-size:1.2rem; border-top:1px solid #334155; padding-top:12px; margin-top:10px; align-items: center;">
+                                        <span style="color: #94a3b8;">💰 Cuota Mensual</span>
+                                        <span id="loan-monthly-preview" style="color:#facc15; font-weight:800; font-size: 1.4rem;">0,00 €</span>
                                     </div>
                                 </div>
 
-                                <button id="btn-request-loan-dynamic" class="btn-action-primary" style="background:#facc15; color:#0f172a; margin-top:20px;">Solicitar Préstamo</button>
+                                <button id="btn-request-loan-dynamic" class="btn-action-primary" style="background: linear-gradient(135deg, #facc15, #eab308); color:#0f172a; margin-top:25px; width: 100%; padding: 14px; font-size: 1rem; border-radius: 12px; font-weight: 700;">🚀 Solicitar Préstamo</button>
                             </div>
 
                             <!-- RIGHT: ACTIVE LOANS -->
                             <div>
-                                <h3 style="margin-top:0; color:#94a3b8; margin-bottom:20px;">Préstamos Activos (${loans.length})</h3>
+                                <h3 style="margin-top:0; color:#94a3b8; margin-bottom:20px; display: flex; align-items: center; gap: 10px;">
+                                    <span style="font-size: 1.3rem;">📋</span> Préstamos Activos (${loans.length})
+                                </h3>
                                 <div id="active-loans-wrapper">
                                     ${loans.length === 0 ?
-                '<p style="color:#64748b; font-style:italic; border:1px dashed #334155; padding:20px; border-radius:8px; text-align:center;">No tienes deudas activas. ¡Buen trabajo!</p>' :
+                `<div style="background: linear-gradient(145deg, rgba(74, 222, 128, 0.05), #0f172a); border:1px solid rgba(74, 222, 128, 0.2); padding:30px; border-radius:16px; text-align:center;">
+                                        <div style="font-size: 3rem; margin-bottom: 15px; filter: drop-shadow(0 0 10px rgba(74, 222, 128, 0.3));">🎉</div>
+                                        <p style="color:#4ade80; font-weight: 700; font-size: 1.1rem; margin: 0;">¡Sin deudas!</p>
+                                        <p style="color:#94a3b8; font-size: 0.9rem; margin-top: 8px;">No tienes préstamos activos.</p>
+                                    </div>` :
                 loans.map(loan => {
                     const progress = ((loan.termMonths - loan.remainingMonths) / loan.termMonths) * 100;
+                    const loanIcon = loan.type.includes('Hipotecario') ? '🏠' : '💳';
                     return `
                                             <div class="active-loan-card">
-                                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                                                    <strong style="color:#fff; font-size:1.1rem;">${loan.type}</strong>
-                                                    <span style="background:rgba(239, 68, 68, 0.2); color:#f87171; padding:2px 8px; border-radius:4px; font-size:0.8rem;">-${formatCurrency(loan.remainingBalance)}</span>
+                                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                                                    <div style="display: flex; align-items: center; gap: 12px;">
+                                                        <span style="font-size: 1.8rem;">${loanIcon}</span>
+                                                        <strong style="color:#fff; font-size:1.1rem;">${loan.type}</strong>
+                                                    </div>
+                                                    <span style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(220, 38, 38, 0.1)); color:#f87171; padding:6px 12px; border-radius:20px; font-size:0.85rem; font-weight: 700; border: 1px solid rgba(239, 68, 68, 0.3);">-${formatCurrency(loan.remainingBalance)}</span>
                                                 </div>
-                                                <div style="display:flex; justify-content:space-between; font-size:0.9rem; color:#cbd5e1;">
-                                                    <span>Cuota: ${formatCurrency(loan.monthlyPayment)}</span>
-                                                    <span>Restan: ${loan.remainingMonths} meses</span>
+                                                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size:0.85rem; color:#cbd5e1; background: rgba(15, 23, 42, 0.5); padding: 12px; border-radius: 10px;">
+                                                    <div><span style="color:#94a3b8;">Cuota:</span> <span style="color: #facc15; font-weight: 600;">${formatCurrency(loan.monthlyPayment)}</span></div>
+                                                    <div><span style="color:#94a3b8;">Restan:</span> <span style="font-weight: 600;">${loan.remainingMonths} meses</span></div>
                                                 </div>
                                                 <div class="loan-progress">
                                                     <div class="loan-bar" style="width:${progress}%"></div>
                                                 </div>
-                                                <div class="loan-actions">
-                                                    <button class="btn-pay-loan" data-id="${loan.id}" style="background:#ef4444; color:white; border:none; border-radius:4px; padding:5px 10px; cursor:pointer; font-size:0.8rem; margin-top:5px;">Liquidar Total</button>
-                                                    <button class="btn-pay-partial" data-id="${loan.id}" style="background:#3b82f6; color:white; border:none; border-radius:4px; padding:5px 10px; cursor:pointer; font-size:0.8rem; margin-top:5px; margin-left:5px;">Amortizar</button>
+                                                <div style="display: flex; gap: 10px; margin-top: 12px;">
+                                                    <button class="btn-pay-loan" data-id="${loan.id}" style="flex: 1; background: linear-gradient(135deg, #ef4444, #dc2626); color:white; border:none; border-radius:8px; padding:10px; cursor:pointer; font-size:0.85rem; font-weight: 700;">Liquidar</button>
+                                                    <button class="btn-pay-partial" data-id="${loan.id}" style="flex: 1; background: linear-gradient(135deg, #3b82f6, #2563eb); color:white; border:none; border-radius:8px; padding:10px; cursor:pointer; font-size:0.85rem; font-weight: 700;">Amortizar</button>
                                                 </div>
-                                                <div style="font-size:0.75rem; color:#64748b; margin-top:5px;">Interés Anual: ${(loan.interestRate * 100).toFixed(2)}%</div>
+                                                <div style="font-size:0.75rem; color:#64748b; margin-top:10px; text-align: center;">Interés: ${(loan.interestRate * 100).toFixed(2)}% anual</div>
                                             </div>
                                             `;
                 }).join('')
@@ -3105,6 +3144,7 @@ var UI = {
                         </div>
                     </div>
                 `;
+
 
         // EVENTS
         const amountIn = document.getElementById('loan-amount-input');
@@ -4632,25 +4672,62 @@ var UI = {
                     expText = `${JobSys.monthsInCurrentJob.toFixed(1)} / ${nextJob.reqMonths} meses`;
                 }
 
+                // Get job icon based on career path
+                const getJobIconForPath = (path) => {
+                    const icons = {
+                        'unskilled': '🛒',
+                        'tres_deporte': '👟',
+                        'admin_contable': '📋',
+                        'gestor_cobros': '💳',
+                        'admin_inmo': '🏘️',
+                        'prog_apps': '💻',
+                        'sys_support': '🖥️',
+                        'mobile_dev': '📱',
+                        'maint_ind': '🔧',
+                        'clima': '❄️',
+                        'buildings': '🏢',
+                        'analyst_fin': '📊',
+                        'pm_marketing': '📣',
+                        'consultant': '💼',
+                        'data_science': '🧠',
+                        'software_eng': '⌨️',
+                        'devops': '🚀',
+                        'civil_eng': '🏗️',
+                        'site_works': '🦺',
+                        'project_mgmt': '📐',
+                        'temporary': '⏰',
+                        'none': '🔍'
+                    };
+                    return icons[path] || '💼';
+                };
+
+                const jobIcon = getJobIconForPath(JobSys.currentCareerPath);
+
                 heroCard.innerHTML = `
                         <div class="card-header">
                             <span class="badge-primary">PUESTO ACTUAL</span>
                             <span class="salary-badge">${formatCurrency(GameState.salary)}/mes</span>
                         </div>
-                        <h2 class="hero-title">${GameState.jobTitle}</h2>
-                        <div class="career-path">Trayectoria: ${UI.getLabel(JobSys.currentCareerPath)}</div>
-                        
-                        <div class="progress-section">
-                            <div class="progress-label">
-                                <span>Experiencia</span>
-                                <span>${expText}</span>
+                        <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 15px;">
+                            <div style="font-size: 3.5rem; filter: drop-shadow(0 0 15px rgba(56, 189, 248, 0.4));">${jobIcon}</div>
+                            <div>
+                                <h2 class="hero-title" style="margin-bottom: 5px;">${GameState.jobTitle}</h2>
+                                <div class="career-path" style="margin-bottom: 0;">📍 ${UI.getLabel(JobSys.currentCareerPath)}</div>
                             </div>
-                            <div class="progress-track">
-                                <div class="progress-fill" style="width: ${expPercent}%"></div>
+                        </div>
+                        
+                        <div class="progress-section" style="background: rgba(15, 23, 42, 0.5); padding: 15px; border-radius: 12px; margin-top: 10px;">
+                            <div class="progress-label" style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                <span style="color: #94a3b8; font-size: 0.85rem;">⏱️ Experiencia</span>
+                                <span style="color: #38bdf8; font-weight: 700;">${expText}</span>
+                            </div>
+                            <div class="progress-track" style="background: #1e293b; height: 10px; border-radius: 5px; overflow: hidden;">
+                                <div class="progress-fill" style="width: ${expPercent}%; height: 100%; background: linear-gradient(90deg, #38bdf8, #0ea5e9); border-radius: 5px; transition: width 0.3s;"></div>
                             </div>
                         </div>
                     `;
                 dashboardGrid.appendChild(heroCard);
+
 
                 // Promotion / Raise Logic
                 const path = JobSys.getCareerPath(JobSys.currentCareerPath);
