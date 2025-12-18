@@ -3513,8 +3513,10 @@ var UI = {
         const step1 = document.getElementById('wizard-step-1');
         const step2 = document.getElementById('wizard-step-2');
         const dot1 = document.getElementById('wiz-step-ind-1');
-        const dot2 = document.getElementById('wiz-step-ind-2');
-        const bar2 = dot2.querySelector('div');
+        const dot2 = document.getElementById('wiz-step-dot-2');
+        const bar2 = document.getElementById('wiz-step-bar-2');
+        const label2 = document.getElementById('wiz-step-label-2');
+
 
         // Buttons
         const btnNext = document.getElementById('btn-wiz-next');
@@ -3602,33 +3604,49 @@ var UI = {
             card.className = `biz-model-card ${isLocked ? 'locked' : ''}`;
 
             if (isLocked) {
-                card.style.opacity = '0.5';
-                card.style.cursor = 'not-allowed';
-                card.style.filter = 'grayscale(1)';
+                card.style.cssText = 'opacity: 0.6; cursor: not-allowed; filter: grayscale(0.8); background: linear-gradient(145deg, #1e293b, #0f172a); border: 1px solid #334155; border-radius: 16px; padding: 20px;';
                 card.innerHTML = `
-                            <div>
-                                <div class="biz-icon">🔒</div>
-                                <div class="biz-title">${val.name}</div>
-                                <span class="biz-tag" style="background:#334155; color:#94a3b8;">Bloqueado</span>
+                            <div style="text-align: center;">
+                                <div style="font-size: 2.5rem; margin-bottom: 10px; filter: grayscale(1);">🔒</div>
+                                <div style="font-size: 1.1rem; font-weight: 700; color: #64748b; margin-bottom: 8px;">${val.name}</div>
+                                <span style="display: inline-block; background: #334155; color: #64748b; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;">Bloqueado</span>
                             </div>
-                            <div style="margin-top:10px; font-size:0.8rem; color:#fca5a5;">
-                                ⚠️ Requiere 2 Cafeterías<br>
-                                (Tienes: ${cafeCount})
+                            <div style="margin-top: 15px; padding: 12px; background: rgba(248, 113, 113, 0.1); border-radius: 10px; border: 1px solid rgba(248, 113, 113, 0.2); text-align: center;">
+                                <div style="font-size: 0.85rem; color: #f87171;">⚠️ Requiere 2 Cafeterías</div>
+                                <div style="font-size: 0.8rem; color: #94a3b8; margin-top: 4px;">Tienes: <strong style="color: #fbbf24;">${cafeCount}</strong></div>
                             </div>
                         `;
+
             } else {
+                // Premium unlocked card
+                const riskColor = volatility > 0.3 ? '#f87171' : '#4ade80';
+                const riskBg = volatility > 0.3 ? 'rgba(248, 113, 113, 0.1)' : 'rgba(74, 222, 128, 0.1)';
+                const riskBorder = volatility > 0.3 ? 'rgba(248, 113, 113, 0.3)' : 'rgba(74, 222, 128, 0.3)';
+                const riskText = volatility > 0.3 ? '⚡ Alto Riesgo' : '✓ Estable';
+
+                card.style.cssText = 'background: linear-gradient(145deg, #1e293b, #0f172a); border: 1px solid #334155; border-radius: 16px; padding: 20px; cursor: pointer; transition: all 0.2s;';
                 card.innerHTML = `
-                            <div>
-                                <div class="biz-icon">${icon}</div>
-                                <div class="biz-title">${val.name}</div>
-                                ${riskTag}
+                            <div style="text-align: center; margin-bottom: 15px;">
+                                <div style="font-size: 3rem; margin-bottom: 10px; filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.3));">${icon}</div>
+                                <div style="font-size: 1.2rem; font-weight: 800; color: #fff; margin-bottom: 8px;">${val.name}</div>
+                                <span style="display: inline-block; background: ${riskBg}; color: ${riskColor}; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; border: 1px solid ${riskBorder};">${riskText}</span>
                             </div>
-                            <div>
-                                <div class="biz-stat-row"><span>Inversión</span> <span style="color:white">${formatCurrency(val.cost)}</span></div>
-                                <div class="biz-stat-row"><span>Alquiler Base</span> <span style="color:white">${formatCurrency(val.baseRent)}</span></div>
-                                <div class="biz-stat-row"><span>Demanda</span> <span style="color:white">${val.baseDemand}/mes</span></div>
+                            <div style="display: grid; gap: 8px;">
+                                <div style="display: flex; justify-content: space-between; padding: 8px; background: rgba(251, 191, 36, 0.05); border-radius: 8px;">
+                                    <span style="color: #94a3b8; font-size: 0.85rem;">💰 Inversión</span>
+                                    <span style="color: #fbbf24; font-weight: 700;">${formatCurrency(val.cost)}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 8px; background: rgba(248, 113, 113, 0.05); border-radius: 8px;">
+                                    <span style="color: #94a3b8; font-size: 0.85rem;">🏠 Alquiler</span>
+                                    <span style="color: #f87171; font-weight: 700;">${formatCurrency(val.baseRent)}/mes</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 8px; background: rgba(74, 222, 128, 0.05); border-radius: 8px;">
+                                    <span style="color: #94a3b8; font-size: 0.85rem;">📈 Demanda</span>
+                                    <span style="color: #4ade80; font-weight: 700;">${val.baseDemand}/mes</span>
+                                </div>
                             </div>
                         `;
+
                 card.onclick = () => {
                     typeGrid.querySelectorAll('.biz-model-card').forEach(el => el.classList.remove('selected'));
                     card.classList.add('selected');
@@ -3667,44 +3685,49 @@ var UI = {
             const card = document.createElement('div');
             card.className = 'loc-tier-card';
 
-            // Add locked styling if needed
+            // Get location icon based on key
+            const getLocIcon = (locKey) => {
+                const icons = { 'suburbs': '🏡', 'residential': '🏘️', 'commercial': '🏪', 'downtown': '🌆', 'business_district': '🏙️' };
+                return icons[locKey] || '📍';
+            };
+            const locIcon = getLocIcon(key);
+
+            // Premium styling based on locked status
             if (isLocked) {
-                card.style.opacity = '0.5';
-                card.style.cursor = 'not-allowed';
-                card.style.border = '1px solid #475569';
+                card.style.cssText = 'opacity: 0.6; cursor: not-allowed; filter: grayscale(0.7); background: linear-gradient(145deg, #1e293b, #0f172a); border: 1px solid #334155; border-radius: 16px; padding: 20px;';
+            } else {
+                card.style.cssText = 'background: linear-gradient(145deg, #1e293b, #0f172a); border: 1px solid #334155; border-radius: 16px; padding: 20px; cursor: pointer; transition: all 0.2s;';
             }
 
-            // Re-render when type changes? ideally yes. 
-            // But openCompanyWizard renders once.
-            // We need to re-render locations if we want the price on the card to update?
-            // OR we just rely on summary.
-            // User requested: "deberia actualizarse el precio del almacen segun se seleccione una u otra"
-            // This creates a dependency: Type -> Location Cost.
-            // Since Step 1 comes before Step 2, we can re-render Step 2 when coming from Step 1?
-            // Let's implement that in 'goNext'.
+            // Traffic color based on multiplier
+            const trafficColor = val.trafficMult >= 1.5 ? '#4ade80' : val.trafficMult >= 1.0 ? '#fbbf24' : '#f87171';
 
             card.innerHTML = `
-                        <div>
-                            <div style="font-size:1.8rem; margin-bottom:10px;">${isLocked ? '🔒' : '📍'}</div>
-                            <div class="biz-title">${val.name}${isLocked ? ' 🔒' : ''}</div>
-                            <div style="font-size:0.8rem; color:#94a3b8; line-height:1.4;">
-                                ${isLocked ?
-                    '<span style="color:#fbbf24;">Requiere 2+ negocios para desbloquear</span>' :
-                    'Ideal para negocios que dependen del volumen de gente.'}
-                            </div>
+                        <div style="text-align: center; margin-bottom: 15px;">
+                            <div style="font-size: 2.5rem; margin-bottom: 10px; filter: ${isLocked ? 'grayscale(1)' : 'drop-shadow(0 0 10px rgba(56, 189, 248, 0.3))'};">${isLocked ? '🔒' : locIcon}</div>
+                            <div style="font-size: 1.1rem; font-weight: 800; color: ${isLocked ? '#64748b' : '#fff'}; margin-bottom: 5px;">${val.name}</div>
+                            ${isLocked ?
+                    '<span style="display: inline-block; background: rgba(251, 191, 36, 0.1); color: #fbbf24; padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; border: 1px solid rgba(251, 191, 36, 0.3);">🔒 Req: 2+ negocios</span>' :
+                    '<p style="color: #94a3b8; font-size: 0.8rem; margin: 0;">Ideal para negocios de volumen</p>'
+                }
                         </div>
-                        <div style="margin-top:15px;">
-                            <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:#cbd5e1;">
-                                <span>Tráfico</span>
-                                <span>x${val.trafficMult}</span>
+                        <div style="display: grid; gap: 10px;">
+                            <div>
+                                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 5px;">
+                                    <span style="color: #94a3b8;">👥 Tráfico</span>
+                                    <span style="color: ${trafficColor}; font-weight: 700;">x${val.trafficMult}</span>
+                                </div>
+                                <div style="background: #0f172a; border-radius: 6px; height: 8px; overflow: hidden;">
+                                    <div style="width: ${trafficPct}%; height: 100%; background: linear-gradient(90deg, ${trafficColor}, ${trafficColor}99); border-radius: 6px;"></div>
+                                </div>
                             </div>
-                            <div class="traffic-viz"><div class="traffic-fill" style="width:${trafficPct}%"></div></div>
-                            <div class="biz-stat-row" style="margin-top:5px;">
-                                <span>Coste Alquiler</span> 
-                                <span class="loc-price-tag" data-mult="${val.rentMult}" style="${priceClass}">${priceDisplay}</span>
+                            <div style="display: flex; justify-content: space-between; padding: 10px; background: rgba(248, 113, 113, 0.05); border-radius: 8px; margin-top: 5px;">
+                                <span style="color: #94a3b8; font-size: 0.85rem;">🏠 Alquiler</span>
+                                <span class="loc-price-tag" data-mult="${val.rentMult}" style="color: #f87171; font-weight: 700;">${priceDisplay}</span>
                             </div>
                         </div>
                     `;
+
 
             card.onclick = () => {
                 if (isLocked) {
@@ -5276,18 +5299,25 @@ var UI = {
 
                 contentContainer.appendChild(marketSection);
 
-                // 4. Entrepreneur Footer
+                // 4. Entrepreneur Footer - Premium Design
                 const entrepreneurSection = document.createElement('div');
                 entrepreneurSection.className = 'entrepreneur-footer';
                 entrepreneurSection.innerHTML = `
-                        <div class="entrepreneur-content">
-                            <div class="entrepreneur-text">
-                                <h3>🚀 ¿Listo para dar el gran salto?</h3>
-                                <p>Deja tu empleo y construye tu propio legado.</p>
+                        <div style="background: linear-gradient(145deg, rgba(251, 191, 36, 0.1), rgba(245, 158, 11, 0.05)); border: 1px solid rgba(251, 191, 36, 0.3); border-radius: 20px; padding: 30px; position: relative; overflow: hidden; margin-top: 25px;">
+                            <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #fbbf24, #f59e0b);"></div>
+                            <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px;">
+                                <div style="flex: 1; min-width: 200px;">
+                                    <div style="font-size: 2.5rem; margin-bottom: 10px; filter: drop-shadow(0 0 15px rgba(251, 191, 36, 0.5));">🚀</div>
+                                    <h3 style="margin: 0 0 8px 0; font-size: 1.3rem; color: #fbbf24; font-weight: 800;">¿Listo para dar el gran salto?</h3>
+                                    <p style="color: #94a3b8; margin: 0; font-size: 0.9rem;">Deja tu empleo y construye tu propio legado empresarial.</p>
+                                </div>
+                                <button id="btn-found-company" style="background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #0f172a; border: none; padding: 16px 40px; border-radius: 12px; font-weight: 900; font-size: 1rem; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 0 #b45309, 0 8px 20px rgba(251, 191, 36, 0.3); transition: all 0.15s;">
+                                    🏢 FUNDAR EMPRESA
+                                </button>
                             </div>
-                            <button id="btn-found-company" class="btn-entrepreneur">FUNDAR EMPRESA</button>
                         </div>
                     `;
+
                 entrepreneurSection.querySelector('#btn-found-company').onclick = () => UI.openCompanyWizard();
                 contentContainer.appendChild(entrepreneurSection);
             } else {
@@ -5297,46 +5327,58 @@ var UI = {
 
                 contentContainer.innerHTML = `
                         <div class="company-dashboard">
-                            <div class="company-header">
-                                <div>
-                                    <h2>${co.name}</h2>
-                                    <p>${co.typeName} | ${co.locationName}</p>
-                                </div>
-                                <div class="company-finance-summary">
-                                    <div class="fin-box"><span class="label">Caja</span><span class="val">${formatCurrency(co.cash)}</span></div>
-                                    <div class="fin-box"><span class="label">Beneficio Mes</span><span class="val ${co.profitLastMonth >= 0 ? 'green' : 'red'}">${formatCurrency(co.profitLastMonth)}</span></div>
-                                    <button id="btn-automate" class="btn-gold" style="font-size:0.7rem;">Automatizar</button>
+                            <!-- Company Hero Header - Premium Design -->
+                            <div style="background: linear-gradient(145deg, rgba(251, 191, 36, 0.12), rgba(245, 158, 11, 0.05)); border: 1px solid rgba(251, 191, 36, 0.3); border-radius: 20px; padding: 25px; position: relative; overflow: hidden; margin-bottom: 20px;">
+                                <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #fbbf24, #f59e0b);"></div>
+                                <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 20px;">
+                                    <div style="display: flex; align-items: center; gap: 15px;">
+                                        <div style="font-size: 3rem; filter: drop-shadow(0 0 15px rgba(251, 191, 36, 0.5));">🏢</div>
+                                        <div>
+                                            <h2 style="margin: 0 0 5px 0; font-size: 1.5rem; color: #fbbf24; font-weight: 800;">${co.name}</h2>
+                                            <p style="margin: 0; color: #94a3b8; font-size: 0.9rem;">${co.typeName} • ${co.locationName}</p>
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                                        <div style="background: linear-gradient(145deg, rgba(74, 222, 128, 0.1), transparent); padding: 12px 18px; border-radius: 12px; border: 1px solid rgba(74, 222, 128, 0.3); text-align: center; min-width: 100px;">
+                                            <div style="font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">💵 Caja</div>
+                                            <div style="font-size: 1.2rem; font-weight: 800; color: #4ade80;">${formatCurrency(co.cash)}</div>
+                                        </div>
+                                        <div style="background: linear-gradient(145deg, ${co.profitLastMonth >= 0 ? 'rgba(74, 222, 128, 0.1)' : 'rgba(248, 113, 113, 0.1)'}, transparent); padding: 12px 18px; border-radius: 12px; border: 1px solid ${co.profitLastMonth >= 0 ? 'rgba(74, 222, 128, 0.3)' : 'rgba(248, 113, 113, 0.3)'}; text-align: center; min-width: 100px;">
+                                            <div style="font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">📈 Beneficio</div>
+                                            <div style="font-size: 1.2rem; font-weight: 800; color: ${co.profitLastMonth >= 0 ? '#4ade80' : '#f87171'};">${co.profitLastMonth >= 0 ? '+' : ''}${formatCurrency(co.profitLastMonth)}</div>
+                                        </div>
+                                        <button id="btn-automate" style="background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #0f172a; border: none; padding: 12px 20px; border-radius: 10px; font-weight: 800; font-size: 0.8rem; cursor: pointer; box-shadow: 0 3px 0 #b45309; transition: all 0.15s;">
+                                            🤖 Automatizar
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
 
-                            <div class="company-tabs">
-                                <button class="tab-btn ${activeTab === 'summary' ? 'active' : ''}" data-tab="summary">
-                                    <span class="mobile-text">📊</span>
-                                    <span class="desktop-text">Resumen</span>
+                            <!-- Company Tabs - Premium Design -->
+                            <div style="display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; background: #1e293b; padding: 8px; border-radius: 12px;">
+                                <button class="tab-btn ${activeTab === 'summary' ? 'active' : ''}" data-tab="summary" style="flex: 1; min-width: 60px; padding: 12px 8px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 0.85rem; transition: all 0.2s; ${activeTab === 'summary' ? 'background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #0f172a;' : 'background: transparent; color: #94a3b8;'}">
+                                    📊 <span class="desktop-text">Resumen</span>
                                 </button>
-                                <button class="tab-btn ${activeTab === 'staff' ? 'active' : ''}" data-tab="staff">
-                                    <span class="mobile-text">👥</span>
-                                    <span class="desktop-text">Personal</span>
+                                <button class="tab-btn ${activeTab === 'staff' ? 'active' : ''}" data-tab="staff" style="flex: 1; min-width: 60px; padding: 12px 8px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 0.85rem; transition: all 0.2s; ${activeTab === 'staff' ? 'background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #0f172a;' : 'background: transparent; color: #94a3b8;'}">
+                                    👥 <span class="desktop-text">Personal</span>
                                 </button>
-                                <button class="tab-btn ${activeTab === 'product' ? 'active' : ''}" data-tab="product">
-                                    <span class="mobile-text">📦</span>
-                                    <span class="desktop-text">Producto</span>
+                                <button class="tab-btn ${activeTab === 'product' ? 'active' : ''}" data-tab="product" style="flex: 1; min-width: 60px; padding: 12px 8px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 0.85rem; transition: all 0.2s; ${activeTab === 'product' ? 'background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #0f172a;' : 'background: transparent; color: #94a3b8;'}">
+                                    📦 <span class="desktop-text">Producto</span>
                                 </button>
-                                <button class="tab-btn ${activeTab === 'marketing' ? 'active' : ''}" data-tab="marketing">
-                                    <span class="mobile-text">📢</span>
-                                    <span class="desktop-text">Marketing</span>
+                                <button class="tab-btn ${activeTab === 'marketing' ? 'active' : ''}" data-tab="marketing" style="flex: 1; min-width: 60px; padding: 12px 8px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 0.85rem; transition: all 0.2s; ${activeTab === 'marketing' ? 'background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #0f172a;' : 'background: transparent; color: #94a3b8;'}">
+                                    📢 <span class="desktop-text">Marketing</span>
                                 </button>
-                                <button class="tab-btn ${activeTab === 'finance' ? 'active' : ''}" data-tab="finance">
-                                    <span class="mobile-text">💰</span>
-                                    <span class="desktop-text">Finanzas</span>
+                                <button class="tab-btn ${activeTab === 'finance' ? 'active' : ''}" data-tab="finance" style="flex: 1; min-width: 60px; padding: 12px 8px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 0.85rem; transition: all 0.2s; ${activeTab === 'finance' ? 'background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #0f172a;' : 'background: transparent; color: #94a3b8;'}">
+                                    💰 <span class="desktop-text">Finanzas</span>
                                 </button>
                             </div>
 
-                            <div class="company-tab-content" id="co-tab-content">
+                            <div class="company-tab-content" id="co-tab-content" style="background: linear-gradient(145deg, #1e293b, #0f172a); border: 1px solid #334155; border-radius: 16px; padding: 20px;">
                                 <!-- Content injected here -->
                             </div>
                         </div>
                     `;
+
 
                 contentContainer.querySelectorAll('.tab-btn').forEach(btn => {
                     btn.onclick = () => {
@@ -5420,49 +5462,82 @@ var UI = {
                         };
 
                         tabContent.innerHTML = `
-                                <div class="summary-grid">
-                                    <div class="card kpi-card">
-                                        <h3>Estado General</h3>
-                                        <p>Reputación: <strong>${co.reputation.toFixed(1)}/5.0</strong></p>
-                                        <p>Clientes: ${co.lastStats ? co.lastStats.customers : 0} / mes</p>
-                                        <p style="font-size:0.8rem; color:#94a3b8">Capacidad: <strong>${co.lastStats ? co.lastStats.capacity : 0}</strong> / mes</p>
-                                        <div style="margin-top:10px; border-top:1px solid #334155; padding-top:5px;">
-                                            <p>Ingresos: ${formatCurrency(co.revenueLastMonth)} ${fmtDiff(revDiff)}</p>
-                                            <p>Gastos: ${formatCurrency(co.expensesLastMonth)} ${fmtDiff(expDiff)}</p>
-                                            <p style="font-size:1.1rem; margin-top:5px;">Beneficio: <strong style="color:${co.profitLastMonth >= 0 ? 'var(--success-color)' : 'var(--danger-color)'}">${formatCurrency(co.profitLastMonth)}</strong> ${fmtDiff(profDiff)}</p>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+                                    <!-- Estado General Card -->
+                                    <div style="background: linear-gradient(145deg, rgba(74, 222, 128, 0.08), transparent); border: 1px solid rgba(74, 222, 128, 0.2); border-radius: 16px; padding: 20px;">
+                                        <h3 style="margin: 0 0 15px 0; color: #4ade80; font-size: 1rem; display: flex; align-items: center; gap: 8px;">
+                                            <span style="font-size: 1.3rem;">📊</span> Estado General
+                                        </h3>
+                                        <div style="display: grid; gap: 10px;">
+                                            <div style="display: flex; justify-content: space-between;">
+                                                <span style="color: #94a3b8;">⭐ Reputación</span>
+                                                <span style="font-weight: 700; color: #fbbf24;">${co.reputation.toFixed(1)}/5.0</span>
+                                            </div>
+                                            <div style="display: flex; justify-content: space-between;">
+                                                <span style="color: #94a3b8;">👥 Clientes/mes</span>
+                                                <span style="font-weight: 700; color: #fff;">${co.lastStats ? co.lastStats.customers : 0}</span>
+                                            </div>
+                                            <div style="display: flex; justify-content: space-between;">
+                                                <span style="color: #94a3b8;">📦 Capacidad/mes</span>
+                                                <span style="font-weight: 700; color: #fff;">${co.lastStats ? co.lastStats.capacity : 0}</span>
+                                            </div>
+                                        </div>
+                                        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #334155;">
+                                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                                <span style="color: #94a3b8;">Ingresos</span>
+                                                <span style="color: #4ade80; font-weight: 700;">${formatCurrency(co.revenueLastMonth)} ${fmtDiff(revDiff)}</span>
+                                            </div>
+                                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                                <span style="color: #94a3b8;">Gastos</span>
+                                                <span style="color: #f87171; font-weight: 700;">${formatCurrency(co.expensesLastMonth)}</span>
+                                            </div>
+                                            <div style="display: flex; justify-content: space-between; font-size: 1.1rem; padding-top: 8px; border-top: 1px dashed #334155;">
+                                                <span style="color: #fff; font-weight: 700;">Beneficio</span>
+                                                <span style="color: ${co.profitLastMonth >= 0 ? '#4ade80' : '#f87171'}; font-weight: 800;">${co.profitLastMonth >= 0 ? '+' : ''}${formatCurrency(co.profitLastMonth)}</span>
+                                            </div>
                                         </div>
                                     </div>
 
-                                    <div class="card events-card">
-                                        <h3>📢 Novedades</h3>
-                                        <ul style="max-height:150px; overflow-y:auto; padding-left:20px;">${eventsHtml}</ul>
+                                    <!-- Novedades Card -->
+                                    <div style="background: linear-gradient(145deg, rgba(56, 189, 248, 0.08), transparent); border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 16px; padding: 20px;">
+                                        <h3 style="margin: 0 0 15px 0; color: #38bdf8; font-size: 1rem; display: flex; align-items: center; gap: 8px;">
+                                            <span style="font-size: 1.3rem;">📢</span> Novedades
+                                        </h3>
+                                        <ul style="max-height: 150px; overflow-y: auto; padding-left: 20px; color: #cbd5e1; font-size: 0.9rem; line-height: 1.6;">${eventsHtml}</ul>
                                     </div>
                                     
-                                    <div class="card breakdown-card">
-                                        <h3>📋 Desglose Financiero</h3>
-                                        <table style="width:100%; font-size:0.85rem; border-collapse:collapse;">
-                                            <tr style="border-bottom:1px solid #334155;">
-                                                <td style="padding:4px 0;">Ventas</td>
-                                                <td style="text-align:right; color:#4ade80;">+${formatCurrency(income.revenue)}</td>
+                                    <!-- Desglose Financiero Card -->
+                                    <div style="background: linear-gradient(145deg, rgba(168, 85, 247, 0.08), transparent); border: 1px solid rgba(168, 85, 247, 0.2); border-radius: 16px; padding: 20px;">
+                                        <h3 style="margin: 0 0 15px 0; color: #a855f7; font-size: 1rem; display: flex; align-items: center; gap: 8px;">
+                                            <span style="font-size: 1.3rem;">📋</span> Desglose Financiero
+                                        </h3>
+                                        <table style="width: 100%; font-size: 0.85rem; border-collapse: collapse;">
+                                            <tr style="border-bottom: 1px solid #334155;">
+                                                <td style="padding: 6px 0; color: #94a3b8;">💵 Ventas</td>
+                                                <td style="text-align: right; color: #4ade80; font-weight: 700;">+${formatCurrency(income.revenue)}</td>
                                             </tr>
-                                            <tr><td style="padding:4px 0;">Coste Bienes (COGS)</td><td style="text-align:right;">-${formatCurrency(details.cogs)}</td></tr>
-                                            <tr><td style="padding:4px 0;">Salarios Plantilla</td><td style="text-align:right;">-${formatCurrency(details.wages)}</td></tr>
-                                            <tr><td style="padding:4px 0;">Alquiler</td><td style="text-align:right;">-${formatCurrency(details.rent)}</td></tr>
-                                            <tr><td style="padding:4px 0;">Marketing</td><td style="text-align:right;">-${formatCurrency(details.marketing)}</td></tr>
-                                            <tr><td style="padding:4px 0;">Operaciones (I+D)</td><td style="text-align:right;">-${formatCurrency(details.opex)}</td></tr>
-                                            <tr style="border-bottom:1px solid #334155;"><td style="padding:4px 0;">Salario CEO</td><td style="text-align:right;">-${formatCurrency(details.salary)}</td></tr>
-                                            <tr style="font-weight:bold;"><td style="padding-top:5px;">TOTAL GASTOS</td><td style="text-align:right; padding-top:5px;">-${formatCurrency(co.expensesLastMonth)}</td></tr>
+                                            <tr><td style="padding: 6px 0; color: #94a3b8;">📦 COGS</td><td style="text-align: right; color: #f87171;">-${formatCurrency(details.cogs)}</td></tr>
+                                            <tr><td style="padding: 6px 0; color: #94a3b8;">👥 Salarios</td><td style="text-align: right; color: #f87171;">-${formatCurrency(details.wages)}</td></tr>
+                                            <tr><td style="padding: 6px 0; color: #94a3b8;">🏠 Alquiler</td><td style="text-align: right; color: #f87171;">-${formatCurrency(details.rent)}</td></tr>
+                                            <tr><td style="padding: 6px 0; color: #94a3b8;">📢 Marketing</td><td style="text-align: right; color: #f87171;">-${formatCurrency(details.marketing)}</td></tr>
+                                            <tr><td style="padding: 6px 0; color: #94a3b8;">🔬 I+D</td><td style="text-align: right; color: #f87171;">-${formatCurrency(details.opex)}</td></tr>
+                                            <tr style="border-bottom: 1px solid #334155;"><td style="padding: 6px 0; color: #94a3b8;">👔 Salario CEO</td><td style="text-align: right; color: #f87171;">-${formatCurrency(details.salary)}</td></tr>
+                                            <tr style="font-weight: bold;"><td style="padding-top: 10px; color: #fff;">TOTAL GASTOS</td><td style="text-align: right; padding-top: 10px; color: #f87171;">-${formatCurrency(co.expensesLastMonth)}</td></tr>
                                         </table>
                                     </div>
 
-                                    <div class="card chart-card">
-                                        <h3>Evolución Financiera</h3>
-                                        <div style="height:200px; width:100%;">
+                                    <!-- Gráfico Card -->
+                                    <div style="background: linear-gradient(145deg, rgba(251, 191, 36, 0.08), transparent); border: 1px solid rgba(251, 191, 36, 0.2); border-radius: 16px; padding: 20px;">
+                                        <h3 style="margin: 0 0 15px 0; color: #fbbf24; font-size: 1rem; display: flex; align-items: center; gap: 8px;">
+                                            <span style="font-size: 1.3rem;">📈</span> Evolución Financiera
+                                        </h3>
+                                        <div style="height: 200px; width: 100%;">
                                             <canvas id="revenueChart"></canvas>
                                         </div>
                                     </div>
                                 </div>
                             `;
+
 
                         if (co.revenueHistory && co.revenueHistory.length > 0) {
                             const ctx = document.getElementById('revenueChart').getContext('2d');
