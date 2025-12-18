@@ -257,43 +257,65 @@
             }
 
             #next-turn-btn {
-                background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 50%, #06b6d4 100%);
-                color: #0f172a;
-                border: none;
-                padding: 14px 35px;
-                border-radius: 30px;
+                background: linear-gradient(135deg,
+                        #60a5fa 0%,
+                        #3b82f6 25%,
+                        #2563eb 50%,
+                        #1d4ed8 75%,
+                        #1e40af 100%);
+                color: white;
+                border: 2px solid rgba(147, 197, 253, 0.5);
+                padding: 14px 40px;
+                border-radius: 50px;
                 font-weight: 900;
-                font-size: 1rem;
+                font-size: 1.05rem;
                 cursor: pointer;
                 text-transform: uppercase;
-                letter-spacing: 1px;
+                letter-spacing: 1.5px;
+                text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
                 box-shadow:
-                    0 0 20px rgba(56, 189, 248, 0.5),
-                    0 0 40px rgba(56, 189, 248, 0.3),
-                    0 0 60px rgba(56, 189, 248, 0.1);
+                    0 0 15px rgba(59, 130, 246, 0.8),
+                    0 0 30px rgba(59, 130, 246, 0.6),
+                    0 0 45px rgba(59, 130, 246, 0.4),
+                    0 0 60px rgba(59, 130, 246, 0.2),
+                    inset 0 0 20px rgba(147, 197, 253, 0.3);
                 transition: all 0.3s ease;
-                animation: neon-pulse 2s ease-in-out infinite;
+                animation: neon-glow 1.5s ease-in-out infinite alternate;
             }
 
-            @keyframes neon-pulse {
-
-                0%,
-                100% {
-                    box-shadow: 0 0 20px rgba(56, 189, 248, 0.5), 0 0 40px rgba(56, 189, 248, 0.3);
+            @keyframes neon-glow {
+                from {
+                    box-shadow:
+                        0 0 15px rgba(59, 130, 246, 0.8),
+                        0 0 30px rgba(59, 130, 246, 0.6),
+                        0 0 45px rgba(59, 130, 246, 0.4),
+                        inset 0 0 20px rgba(147, 197, 253, 0.3);
                 }
 
-                50% {
-                    box-shadow: 0 0 25px rgba(56, 189, 248, 0.7), 0 0 50px rgba(56, 189, 248, 0.4), 0 0 80px rgba(56, 189, 248, 0.2);
+                to {
+                    box-shadow:
+                        0 0 20px rgba(96, 165, 250, 1),
+                        0 0 40px rgba(59, 130, 246, 0.8),
+                        0 0 60px rgba(37, 99, 235, 0.6),
+                        0 0 80px rgba(29, 78, 216, 0.4),
+                        inset 0 0 25px rgba(147, 197, 253, 0.4);
                 }
             }
 
             #next-turn-btn:hover {
                 transform: scale(1.08);
-                background: linear-gradient(135deg, #7dd3fc 0%, #38bdf8 50%, #22d3ee 100%);
+                background: linear-gradient(135deg,
+                        #93c5fd 0%,
+                        #60a5fa 25%,
+                        #3b82f6 50%,
+                        #2563eb 75%,
+                        #1d4ed8 100%);
                 box-shadow:
-                    0 0 30px rgba(56, 189, 248, 0.8),
-                    0 0 60px rgba(56, 189, 248, 0.5),
-                    0 0 100px rgba(56, 189, 248, 0.3);
+                    0 0 25px rgba(96, 165, 250, 1),
+                    0 0 50px rgba(59, 130, 246, 0.9),
+                    0 0 75px rgba(37, 99, 235, 0.7),
+                    0 0 100px rgba(29, 78, 216, 0.5),
+                    inset 0 0 30px rgba(147, 197, 253, 0.5);
             }
 
             #next-turn-btn:active {
@@ -333,42 +355,58 @@
                 margin-top: 2px;
             }
 
-            /* Mobile */
+            /* Mobile - Same layout, just smaller */
             @media (max-width: 768px) {
                 .app-header {
-                    grid-template-columns: 1fr;
-                    gap: 10px;
-                    padding: 10px;
-                }
-
-                .header-center {
-                    order: -1;
-                }
-
-                #next-turn-btn {
-                    width: 100%;
-                    padding: 14px;
-                    font-size: 1rem;
-                }
-
-                .header-bottom-row {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    width: 100%;
+                    grid-template-columns: auto 1fr auto;
+                    gap: 8px;
+                    padding: 8px 10px;
                 }
 
                 .header-left {
-                    flex-direction: row;
-                    gap: 8px;
+                    gap: 4px;
+                }
+
+                .save-btn {
+                    padding: 5px 10px;
+                    font-size: 0.7rem;
+                }
+
+                .save-btn span:last-child {
+                    display: none;
+                }
+
+                .home-btn {
+                    padding: 5px 10px;
+                }
+
+                .home-icon {
+                    font-size: 1rem;
                 }
 
                 #header-player-name {
                     display: none;
                 }
 
-                .save-btn span:last-child {
-                    display: none;
+                #next-turn-btn {
+                    padding: 10px 20px;
+                    font-size: 0.85rem;
+                }
+
+                .money-card {
+                    padding: 5px 10px;
+                }
+
+                .money-icon {
+                    font-size: 1rem;
+                }
+
+                #money-display {
+                    font-size: 1rem;
+                }
+
+                #date-display {
+                    font-size: 0.6rem;
                 }
             }
         </style>
