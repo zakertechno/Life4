@@ -2968,6 +2968,10 @@ var UI = {
             const modalTitle = document.querySelector('#modal-content h2');
             if (modalTitle) modalTitle.style.display = 'none'; // Hide default title
 
+            // MOBILE FIX: Add wrapper class for full-screen handling
+            const modalContent = document.getElementById('modal-content');
+            if (modalContent) modalContent.classList.add('stock-modal-wrapper');
+
             // Close button handler
             document.getElementById('btn-close-stock-modal').onclick = (e) => {
                 const overlay = e.target.closest('.custom-modal-overlay');
