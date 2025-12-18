@@ -5481,7 +5481,7 @@ var UI = {
                                 <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #fbbf24, #f59e0b);"></div>
                                 <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 20px;">
                                     <div style="display: flex; align-items: center; gap: 15px;">
-                                        <div style="font-size: 3rem; filter: drop-shadow(0 0 15px rgba(251, 191, 36, 0.5));">🏢</div>
+                                        <div style="font-size: 3rem; filter: drop-shadow(0 0 15px rgba(251, 191, 36, 0.5));">${CompanyModule.businessTypes[co.typeId]?.icon || '🏢'}</div>
                                         <div>
                                             <h2 style="margin: 0 0 5px 0; font-size: 1.5rem; color: #fbbf24; font-weight: 800;">${co.name}</h2>
                                             <p style="margin: 0; color: #94a3b8; font-size: 0.9rem;">${co.typeName} • ${co.locationName}</p>
