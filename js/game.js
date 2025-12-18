@@ -2884,21 +2884,22 @@ var UI = {
                         <!-- Close Button -->
                         <button id="btn-close-stock-modal" style="position: absolute; top: 10px; right: 10px; background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.5); color: #f87171; width: 36px; height: 36px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">✕</button>
 
+
                         <!-- 1. HEADER (Fixed) - Premium Design -->
-                        <div class="ops-header" style="flex:0 0 auto; background: linear-gradient(145deg, ${trendBg}, transparent); border: 1px solid ${trendBorder}; border-radius: 16px; padding: 20px; margin-bottom: 15px; margin-top: 30px;">
+                        <div class="ops-header" style="flex:0 0 auto; background: linear-gradient(145deg, ${trendBg}, transparent); border: 1px solid ${trendBorder}; border-radius: 16px; padding: 12px 15px; margin-bottom: 10px; margin-top: 15px;">
                             <div style="display:flex; justify-content:space-between; align-items:center;">
-                                <div style="display: flex; align-items: center; gap: 15px;">
-                                    <div style="font-size: 2.5rem; filter: drop-shadow(0 0 10px ${trendColor});">${trendIcon}</div>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div style="font-size: 2rem; filter: drop-shadow(0 0 10px ${trendColor});">${trendIcon}</div>
                                     <div>
-                                        <h3 style="margin:0; font-size:1.4rem; color:white; font-weight: 800;">${stock.symbol}</h3>
-                                        <span style="color:#94a3b8; font-size:0.85rem;">${stock.name}</span>
+                                        <h3 style="margin:0; font-size:1.2rem; color:white; font-weight: 800;">${stock.symbol}</h3>
+                                        <span style="color:#94a3b8; font-size:0.8rem;">${stock.name}</span>
                                     </div>
                                 </div>
                                 <div style="text-align:right;">
-                                    <div style="font-size:1.6rem; font-weight:800; color:${trendColor}; text-shadow: 0 0 15px ${trendColor}40;">
+                                    <div style="font-size:1.4rem; font-weight:800; color:${trendColor}; text-shadow: 0 0 15px ${trendColor}40;">
                                         ${formatCurrency(stock.price)}
                                     </div>
-                                    <span style="font-size:0.9rem; color:${trendColor}; font-weight: 600;">
+                                    <span style="font-size:0.85rem; color:${trendColor}; font-weight: 600;">
                                         ${stock.trend >= 0 ? '▲' : '▼'} ${(Math.abs(stock.trend) * 100).toFixed(2)}%
                                     </span>
                                 </div>
@@ -2909,12 +2910,12 @@ var UI = {
                         <div class="ops-body" style="flex:1 1 auto; overflow-y:auto; min-height:0; padding-right:5px;">
                             
                             <!-- Chart Container -->
-                            <div style="background: linear-gradient(145deg, #1e293b, #0f172a); border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid #334155;">
-                                <div style="height:180px; width:100%;">
-                                    <canvas id="stock-modal-chart"></canvas>
+                            <div style="background: linear-gradient(145deg, #1e293b, #0f172a); border-radius: 12px; padding: 0; margin-bottom: 15px; border: 1px solid #334155; position: relative; overflow: hidden;">
+                                <div style="padding: 10px 15px; border-bottom: 1px solid rgba(51, 65, 85, 0.5); font-size: 0.8rem; color: #94a3b8; background: rgba(15, 23, 42, 0.3);">
+                                    Rendimiento: <span id="chart-roi-display" style="color: white; font-weight: bold;">--</span>
                                 </div>
-                                <div id="chart-overlay-info" style="position:absolute; top:10px; left:10px; background:rgba(0,0,0,0.7); padding:4px 10px; border-radius:6px; font-size:0.8rem; color:white; pointer-events:none;">
-                                    Rendimiento: <span id="chart-roi-display">--</span>
+                                <div style="height:180px; width:100%; padding: 10px;">
+                                    <canvas id="stock-modal-chart"></canvas>
                                 </div>
                             </div>
 
