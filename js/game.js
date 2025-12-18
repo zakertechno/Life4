@@ -5935,33 +5935,176 @@ try {
     if (PersistenceModule.checkSave()) {
         const savedState = JSON.parse(localStorage.getItem(PersistenceModule.SAVE_KEY));
         const msg = `
-                    <div style="text-align:center; padding:20px;">
-                        <div style="font-size:3rem;">💾</div>
-                        <h3>Partida Encontrada</h3>
-                        <p style="color:#cbd5e1; margin-bottom:20px;">
-                            Jugador: <strong>${savedState.playerName || 'Desconocido'}</strong><br>
-                            Dinero: ${formatCurrency(savedState.cash)}<br>
-                            Año: ${savedState.year} | Mes: ${savedState.month}
-                        </p>
-                    </div>
-                 `;
-
-        UI.showModal('Bienvenido de nuevo', msg, [
-            {
-                text: 'Continuar Partida', style: 'success', fn: () => {
-                    PersistenceModule.loadGame();
-                    initGame();
+            <style>
+                .custom-modal-box h3 { display: none !important; }
+                .custom-modal-box .modal-body { padding: 0 !important; }
+                .custom-modal-box { 
+                    max-width: 420px !important; 
+                    border-radius: 24px !important;
+                    overflow: hidden !important;
+                    border: 1px solid #334155 !important;
                 }
-            },
-            {
-                text: 'Nueva Partida', style: 'secondary', fn: () => {
-                    if (confirm("¿Seguro? Se borrará el progreso actual (aunque la partida anterior sigue en memoria hasta que guardes la nueva).")) {
-                        localStorage.removeItem(PersistenceModule.SAVE_KEY);
-                        promptNewUser(initGame);
+                .welcome-back-container {
+                    padding: 30px;
+                    text-align: center;
+                    background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+                    border-radius: 24px;
+                }
+                .welcome-icon {
+                    font-size: 4rem;
+                    margin-bottom: 15px;
+                    display: block;
+                    animation: pulse 2s ease-in-out infinite;
+                }
+                @keyframes pulse {
+                    0%, 100% { transform: scale(1); }
+                    50% { transform: scale(1.1); }
+                }
+                .welcome-title {
+                    color: #38bdf8;
+                    margin: 0 0 20px 0;
+                    font-size: 1.5rem;
+                    font-weight: 700;
+                }
+                .save-info-card {
+                    background: rgba(56, 189, 248, 0.1);
+                    border: 1px solid rgba(56, 189, 248, 0.2);
+                    border-radius: 16px;
+                    padding: 20px;
+                    margin-bottom: 25px;
+                }
+                .player-name {
+                    font-size: 1.3rem;
+                    font-weight: 700;
+                    color: #fbbf24;
+                    margin-bottom: 15px;
+                }
+                .save-stats {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 10px;
+                }
+                .stat-item {
+                    background: rgba(15, 23, 42, 0.5);
+                    padding: 12px;
+                    border-radius: 10px;
+                }
+                .stat-item .label {
+                    font-size: 0.75rem;
+                    color: #94a3b8;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                }
+                .stat-item .value {
+                    font-size: 1.1rem;
+                    font-weight: 700;
+                    color: #4ade80;
+                    margin-top: 4px;
+                }
+                .stat-item .value.date {
+                    color: #e2e8f0;
+                }
+                .welcome-actions {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 12px;
+                }
+                .btn-continue {
+                    width: 100%;
+                    padding: 16px;
+                    font-size: 1.1rem;
+                    font-weight: 700;
+                    border-radius: 12px;
+                    border: none;
+                    cursor: pointer;
+                    background: linear-gradient(135deg, #4ade80, #22c55e);
+                    color: #0f172a;
+                    transition: transform 0.1s, box-shadow 0.2s;
+                    box-shadow: 0 4px 15px rgba(74, 222, 128, 0.3);
+                }
+                .btn-continue:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 6px 20px rgba(74, 222, 128, 0.4);
+                }
+                .btn-new-game {
+                    width: 100%;
+                    padding: 14px;
+                    font-size: 1rem;
+                    font-weight: 600;
+                    border-radius: 12px;
+                    border: 2px solid #475569;
+                    cursor: pointer;
+                    background: transparent;
+                    color: #94a3b8;
+                    transition: all 0.2s;
+                }
+                .btn-new-game:hover {
+                    border-color: #f87171;
+                    color: #f87171;
+                }
+                @media (max-width: 480px) {
+                    .custom-modal-box {
+                        margin: 10px !important;
+                    }
+                    .welcome-back-container {
+                        padding: 25px 20px;
+                    }
+                    .welcome-icon {
+                        font-size: 3rem;
+                    }
+                    .welcome-title {
+                        font-size: 1.3rem;
+                    }
+                    .save-stats {
+                        grid-template-columns: 1fr;
                     }
                 }
+            </style>
+            <div class="welcome-back-container">
+                <span class="welcome-icon">👋</span>
+                <h2 class="welcome-title">¡Bienvenido de nuevo!</h2>
+                
+                <div class="save-info-card">
+                    <div class="player-name">🎮 ${savedState.playerName || 'Jugador'}</div>
+                    <div class="save-stats">
+                        <div class="stat-item">
+                            <div class="label">Dinero</div>
+                            <div class="value">${formatCurrency(savedState.cash)}</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="label">Progreso</div>
+                            <div class="value date">Año ${savedState.year}, Mes ${savedState.month}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="welcome-actions">
+                    <button id="btn-continue-saved" class="btn-continue">
+                        ▶️ Continuar Partida
+                    </button>
+                    <button id="btn-new-game-saved" class="btn-new-game">
+                        🔄 Nueva Partida
+                    </button>
+                </div>
+            </div>
+        `;
+
+        UI.showModal('Bienvenido de nuevo', msg, [], true);
+
+        // Attach handlers after modal is created
+        document.getElementById('btn-continue-saved').onclick = () => {
+            document.querySelector('.custom-modal-overlay').remove();
+            PersistenceModule.loadGame();
+            initGame();
+        };
+
+        document.getElementById('btn-new-game-saved').onclick = () => {
+            if (confirm('¿Seguro? Se borrará el progreso actual.')) {
+                document.querySelector('.custom-modal-overlay').remove();
+                localStorage.removeItem(PersistenceModule.SAVE_KEY);
+                promptNewUser(initGame);
             }
-        ]);
+        };
     } else {
         promptNewUser(initGame);
     }
@@ -5974,13 +6117,15 @@ try {
                         .custom-modal-box .modal-body { padding: 0 !important; }
                         .custom-modal-box { 
                             max-width: 420px !important; 
-                            border-radius: 16px !important;
+                            border-radius: 24px !important;
                             overflow: hidden !important;
+                            border: 1px solid #334155 !important;
                         }
                         .profile-create-container {
-                            padding: 25px;
+                            padding: 30px;
                             text-align: center;
                             background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+                            border-radius: 24px;
                         }
                         .profile-rocket {
                             font-size: 4rem;
