@@ -4781,52 +4781,63 @@ var UI = {
                 `;
 
                 const holdingList = document.createElement('div');
-                holdingList.className = 'holding-grid';
-                // We'll trust CSS or inline styles for grid. 
-                // Let's use inline styles to be safe without touching CSS file yet, or add class.
-                holdingList.style.display = 'grid';
-                holdingList.style.gridTemplateColumns = 'repeat(auto-fill, minmax(300px, 1fr))';
-                holdingList.style.gap = '15px';
+                holdingList.className = 'holding-list-container';
+                holdingList.style.display = 'flex';
+                holdingList.style.flexDirection = 'column';
+                holdingList.style.gap = '12px';
 
                 GameState.ownedCompanies.forEach((co, idx) => {
+                    // Calculate Variation
+                    let pctVar = 0;
+                    if (co.baselineProfit > 0) {
+                        pctVar = ((co.profitLastMonth - co.baselineProfit) / co.baselineProfit) * 100;
+                    }
+                    const isPos = pctVar >= 0;
+                    const varColor = isPos ? '#4ade80' : '#f87171';
+                    const varSign = isPos ? '+' : '';
+
                     const div = document.createElement('div');
-                    div.style.background = 'linear-gradient(145deg, #1e293b, #0f172a)';
-                    div.style.border = '1px solid rgba(251, 191, 36, 0.2)';
-                    div.style.borderRadius = '16px';
-                    div.style.padding = '20px';
-                    div.style.position = 'relative';
-                    div.style.overflow = 'hidden';
-                    div.style.transition = 'transform 0.2s';
-                    div.onmouseover = () => div.style.transform = 'translateY(-3px)';
-                    div.onmouseout = () => div.style.transform = 'translateY(0)';
+                    div.style.background = 'linear-gradient(90deg, #1e293b, #0f172a)';
+                    div.style.border = '1px solid #334155';
+                    div.style.borderLeft = '4px solid #fbbf24'; // Gold accent
+                    div.style.borderRadius = '8px';
+                    div.style.padding = '15px 20px';
+                    div.style.display = 'flex';
+                    div.style.alignItems = 'center';
+                    div.style.justifyContent = 'space-between';
+                    div.style.flexWrap = 'wrap';
+                    div.style.gap = '15px';
+                    div.style.transition = 'all 0.2s';
+                    div.className = 'holding-row-item';
 
                     div.innerHTML = `
-                        <!-- Absolute Decorative Line -->
-                         <div style="position: absolute; top:0; left:0; right:0; height:3px; background: linear-gradient(90deg, #fbbf24, #f59e0b);"></div>
-                        
-                        <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:15px;">
-                            <div>
-                                <h4 style="margin:0; color:#fff; font-size:1.1rem; font-weight:700;">${co.name}</h4>
-                                <div style="font-size:0.8rem; color:#94a3b8;">${co.typeName} • ${co.locationName}</div>
+                        <div style="flex: 2; min-width: 200px;">
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <div style="font-size:1.5rem;">🏢</div>
+                                <div>
+                                    <h4 style="margin:0; color:#f1f5f9; font-size:1.1rem; font-weight:700;">${co.name}</h4>
+                                    <div style="font-size:0.85rem; color:#94a3b8;">${co.typeName} • ${co.locationName}</div>
+                                </div>
                             </div>
-                            <div style="background:rgba(251, 191, 36, 0.1); color:#fbbf24; padding:4px 8px; border-radius:6px; font-size:0.75rem; font-weight:700;">PASSIVE</div>
                         </div>
 
-                        <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.3); padding:10px; border-radius:10px;">
-                            <div style="font-size:0.8rem; color:#94a3b8;">Beneficio Mensual</div>
-                            <div style="font-size:1.1rem; color:#4ade80; font-weight:800;">+${formatCurrency(co.baselineProfit)}</div>
+                        <div style="flex: 1; min-width: 140px; text-align:right;">
+                            <div style="font-size:0.75rem; color:#64748b; text-transform:uppercase; font-weight:600;">Beneficio Actual</div>
+                            <div style="font-size:1.2rem; color:${varColor}; font-weight:800;">+${formatCurrency(co.profitLastMonth)}</div>
+                            <div style="font-size:0.8rem; color:${varColor}; font-weight:600;">${varSign}${pctVar.toFixed(1)}% vs Base</div>
                         </div>
 
-                        <div style="margin-top:15px; display:flex; justify-content:flex-end;">
-                             <button class="btn-sell-passive" data-idx="${idx}" style="background:transparent; border:1px solid #ef4444; color:#ef4444; padding:6px 14px; border-radius:8px; font-size:0.8rem; cursor:pointer; transition:all 0.2s; font-weight:600;">
-                                💸 Vender Activo
+                        <div style="flex: 0 0 auto; text-align:right;">
+                             <button class="btn-sell-passive" data-idx="${idx}" style="background:rgba(239, 68, 68, 0.1); border:1px solid rgba(239, 68, 68, 0.3); color:#ef4444; padding:8px 12px; border-radius:6px; font-size:0.75rem; cursor:pointer; font-weight:700; transition:all 0.1s;">
+                                VENDER
                              </button>
                         </div>
                     `;
 
                     const btnSell = div.querySelector('.btn-sell-passive');
-                    btnSell.onmouseover = () => { btnSell.style.background = '#ef4444'; btnSell.style.color = 'white'; };
-                    btnSell.onmouseout = () => { btnSell.style.background = 'transparent'; btnSell.style.color = '#ef4444'; };
+                    btnSell.onmouseenter = () => { btnSell.style.background = '#ef4444'; btnSell.style.color = 'white'; };
+                    btnSell.onmouseleave = () => { btnSell.style.background = 'rgba(239, 68, 68, 0.1)'; btnSell.style.color = '#ef4444'; };
+
                     div.querySelector('.btn-sell-passive').onclick = () => {
                         UI.confirmModal('Vender Empresa', `¿Seguro que quieres vender ${co.name}?\n\nValoración: 5x Beneficio anual.`, () => {
                             const res = CompanyModule.sellPassiveCompany(idx);
