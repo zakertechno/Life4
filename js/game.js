@@ -5829,27 +5829,110 @@ var UI = {
 
                     tabContent.innerHTML = `
                             <div class="comp-dash-container">
-                                <div class="staff-header" style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #334155; padding-bottom:15px;">
-                                    <h3 style="margin:0;">Plantilla (${co.staff.length} / ${co.maxStaff})</h3>
-                                    <button id="btn-upgrade-office" class="btn-sm" ${upgradeDisabled}>${upgradeText}</button>
+                                <div class="staff-header" style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #334155; padding-bottom:15px; flex-wrap: wrap; gap: 10px;">
+                                    <h3 style="margin:0;">👥 Plantilla (${co.staff.length} / ${co.maxStaff})</h3>
+                                    <button id="btn-upgrade-office" ${upgradeDisabled} style="
+                                        display: inline-flex;
+                                        align-items: center;
+                                        gap: 8px;
+                                        padding: 10px 18px;
+                                        border-radius: 10px;
+                                        font-weight: 700;
+                                        font-size: 0.85rem;
+                                        border: none;
+                                        cursor: ${upgradeDisabled ? 'not-allowed' : 'pointer'};
+                                        transition: all 0.2s;
+                                        ${upgradeDisabled ?
+                            'background: #334155; color: #64748b; opacity: 0.6;' :
+                            'background: linear-gradient(135deg, #a855f7, #7c3aed); color: white; box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);'
+                        }
+                                    "
+                                    onmouseover="${upgradeDisabled ? '' : `this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(168, 85, 247, 0.4)'`}"
+                                    onmouseout="${upgradeDisabled ? '' : `this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(168, 85, 247, 0.3)'`}"
+                                    >
+                                        <span style="font-size: 1.1rem;">🏢</span>
+                                        ${upgradeText}
+                                    </button>
                                 </div>
+                                
+                                <div style="
+                                    background: linear-gradient(145deg, rgba(56, 189, 248, 0.1), rgba(14, 165, 233, 0.05));
+                                    border: 1px solid rgba(56, 189, 248, 0.3);
+                                    border-radius: 16px;
+                                    padding: 25px;
+                                    margin-bottom: 30px;
+                                ">
+                                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+                                        <div style="
+                                            width: 50px; height: 50px;
+                                            background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+                                            border-radius: 14px;
+                                            display: flex; align-items: center; justify-content: center;
+                                            font-size: 1.5rem;
+                                            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
+                                        ">🧑‍💼</div>
+                                        <div>
+                                            <h3 style="margin: 0; color: #38bdf8; font-size: 1.1rem;">Centro de Contratación</h3>
+                                            <p style="margin: 4px 0 0 0; color: #64748b; font-size: 0.8rem;">Plantilla: ${co.staff.length} / ${co.maxStaff}</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px;">
+                                        <div onclick="hireRole('Dependiente', 1200)" style="
+                                            background: linear-gradient(145deg, #1e293b, #0f172a);
+                                            border: 1px solid #334155;
+                                            border-radius: 12px;
+                                            padding: 20px;
+                                            text-align: center;
+                                            cursor: pointer;
+                                            transition: all 0.2s;
+                                        "
+                                        onmouseover="this.style.borderColor='#38bdf8'; this.style.transform='translateY(-2px)'"
+                                        onmouseout="this.style.borderColor='#334155'; this.style.transform='translateY(0)'"
+                                        >
+                                            <div style="font-size: 2rem; margin-bottom: 10px;">👤</div>
+                                            <div style="font-weight: 700; color: #fff; margin-bottom: 5px;">Dependiente</div>
+                                            <div style="font-size: 0.85rem; color: #94a3b8;">Habilidad: 40%</div>
+                                            <div style="
+                                                margin-top: 12px;
+                                                padding: 8px 15px;
+                                                background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+                                                color: #0f172a;
+                                                border-radius: 8px;
+                                                font-weight: 700;
+                                                font-size: 0.85rem;
+                                            ">Contratar • 1.200€/mes</div>
+                                        </div>
+                                        
+                                        <div onclick="${expertLocked ? '' : `hireRole('Experto', 1800)`}" style="
+                                            background: linear-gradient(145deg, #1e293b, #0f172a);
+                                            border: 1px solid ${expertLocked ? '#334155' : '#a855f7'};
+                                            border-radius: 12px;
+                                            padding: 20px;
+                                            text-align: center;
+                                            cursor: ${expertLocked ? 'not-allowed' : 'pointer'};
+                                            transition: all 0.2s;
+                                            opacity: ${expertLocked ? '0.6' : '1'};
+                                        "
+                                        ${expertLocked ? '' : `onmouseover="this.style.borderColor='#a855f7'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 15px rgba(168, 85, 247, 0.2)'"`}
+                                        ${expertLocked ? '' : `onmouseout="this.style.borderColor='#a855f7'; this.style.transform='translateY(0)'; this.style.boxShadow='none'"`}
+                                        >
+                                            <div style="font-size: 2rem; margin-bottom: 10px;">${expertLocked ? '🔒' : '⭐'}</div>
+                                            <div style="font-weight: 700; color: ${expertLocked ? '#64748b' : '#a855f7'}; margin-bottom: 5px;">Experto</div>
+                                            <div style="font-size: 0.85rem; color: #94a3b8;">Habilidad: 80%</div>
+                                            ${expertLocked ?
+                            `<div style="margin-top: 12px; padding: 8px 15px; background: #334155; color: #64748b; border-radius: 8px; font-size: 0.75rem;">🔒 Req: Producto Nv.5</div>` :
+                            `<div style="margin-top: 12px; padding: 8px 15px; background: linear-gradient(135deg, #a855f7, #7c3aed); color: #fff; border-radius: 8px; font-weight: 700; font-size: 0.85rem;">Contratar • 1.800€/mes</div>`
+                        }
+                                        </div>
+                                    </div>
+                                    
+                                    ${expertLocked ? '<p style="color:#fbbf24; font-size:0.8rem; margin: 15px 0 0 0; text-align: center;">💡 Mejora tu Producto a Nivel 5 para desbloquear talento experto.</p>' : ''}
+                                </div>
+                                
+                                <h4 style="color:#94a3b8; margin-bottom: 15px; border-bottom: 1px solid #334155; padding-bottom: 10px;">📋 Empleados Actuales</h4>
                                 <div class="staff-grid">
                                     ${staffHtml || '<div style="grid-column:1/-1; text-align:center; padding:40px; color:#64748b;">No hay empleados contratados.</div>'}
-                                </div>
-                                <div class="hire-panel">
-                                    <h4 style="margin-top:0; color:#38bdf8;">Centro de Contratación</h4>
-                                    <div class="hire-grid">
-                                        <button onclick="hireRole('Dependiente', 1200)" class="btn-hire">
-                                            <div style="font-weight:700;">Dependiente</div>
-                                            <div style="font-size:0.8rem; opacity:0.8;">1.200€ / mes</div>
-                                        </button>
-                                        <button onclick="hireRole('Experto', 1800)" class="btn-hire" ${expertBtnDisabled} style="${expertBtnStyle}" title="${expertLocked ? 'Requiere Nivel de Producto 5 (Actual: ' + co.productLevel + ')' : ''}">
-                                            <div style="font-weight:700;">${expertLocked ? '🔒 Experto' : 'Experto'}</div>
-                                            <div style="font-size:0.8rem; opacity:0.8;">1.800€ / mes</div>
-                                            ${expertLocked ? '<div style="font-size:0.7rem; color:#f87171; margin-top:2px;">Req: Nv.5</div>' : ''}
-                                        </button>
-                                    </div>
-                                    ${expertLocked ? '<p style="color:#fbbf24; font-size:0.75rem; margin-top:15px;">💡 Mejora tu Producto a Nivel 5 para atraer talento experto.</p>' : ''}
                                 </div>
                             </div>
                         `;
@@ -6116,6 +6199,55 @@ var UI = {
 
                     tabContent.innerHTML = `
                             <div class="comp-dash-container">
+                                <div style="
+                                    background: linear-gradient(145deg, rgba(74, 222, 128, 0.1), rgba(34, 197, 94, 0.05));
+                                    border: 1px solid rgba(74, 222, 128, 0.3);
+                                    border-radius: 16px;
+                                    padding: 25px;
+                                    margin-bottom: 30px;
+                                ">
+                                    <div style="display: flex; align-items: flex-start; gap: 20px; flex-wrap: wrap;">
+                                        <div style="
+                                            width: 60px; height: 60px;
+                                            background: linear-gradient(135deg, #4ade80, #22c55e);
+                                            border-radius: 16px;
+                                            display: flex; align-items: center; justify-content: center;
+                                            font-size: 1.8rem;
+                                            box-shadow: 0 4px 15px rgba(74, 222, 128, 0.3);
+                                            flex-shrink: 0;
+                                        ">🔬</div>
+                                        <div style="flex: 1; min-width: 200px;">
+                                            <h3 style="margin: 0 0 8px 0; color: #4ade80; font-size: 1.1rem;">Desarrollo de Producto</h3>
+                                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                                <span style="color: #fff; font-weight: 800; font-size: 1.5rem;">Nivel ${co.productLevel}</span>
+                                                <span style="color: #64748b; font-size: 0.85rem;">/ 10</span>
+                                            </div>
+                                            <div style="background: #0f172a; border-radius: 8px; height: 10px; overflow: hidden; margin-bottom: 12px;">
+                                                <div style="width: ${co.productLevel * 10}%; height: 100%; background: linear-gradient(90deg, #4ade80, #22c55e); border-radius: 8px; transition: width 0.3s;"></div>
+                                            </div>
+                                            <p style="color: #94a3b8; font-size: 0.85rem; margin: 0;">
+                                                Cada nivel aumenta la <strong style="color: #4ade80;">calidad base +5%</strong> → Mayor satisfacción.
+                                            </p>
+                                        </div>
+                                        <button onclick="investCo('product_dev')" style="
+                                            background: linear-gradient(135deg, #4ade80, #22c55e);
+                                            color: #0f172a;
+                                            border: none;
+                                            padding: 14px 28px;
+                                            border-radius: 12px;
+                                            font-weight: 800;
+                                            font-size: 0.95rem;
+                                            cursor: pointer;
+                                            box-shadow: 0 4px 15px rgba(74, 222, 128, 0.3);
+                                            transition: all 0.2s;
+                                            white-space: nowrap;
+                                        "
+                                        onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(74, 222, 128, 0.4)'"
+                                        onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(74, 222, 128, 0.3)'"
+                                        >⬆️ Mejorar (${formatCurrency(co.productLevel * 5000)})</button>
+                                    </div>
+                                </div>
+                                
                                 <div class="strategy-grid">
                                     <div class="strat-card">
                                         <h4 class="staff-role-title" style="margin-bottom:15px;">🏷️ Estrategia de Precio</h4>
@@ -6162,19 +6294,8 @@ var UI = {
                                     </div>
                                 </div>
                                 
-                                <h3 style="border-bottom:1px solid #334155; padding-bottom:5px; margin-bottom:15px;">📦 Proveedores (Insumos)</h3>
-                                <div class="options-grid" style="margin-bottom:20px;">${provOpts}</div>
-
-                                <h3 style="border-bottom:1px solid #334155; padding-bottom:5px; margin-bottom:15px;">🚀 Desarrollo de Producto</h3>
-                                <div class="invest-grid">
-                                    <div class="invest-card">
-                                        <div>
-                                            <h4 class="staff-role-title">Producto (Nivel ${co.productLevel})</h4>
-                                            <p style="color:#94a3b8; font-size:0.9rem; margin-top:5px;">Mejora la calidad base (+5%) y aumenta la satisfacción del cliente.</p>
-                                        </div>
-                                        <button onclick="investCo('product_dev')" class="btn-action-primary" style="width:100%; margin-top:10px;">Invertir (${formatCurrency(co.productLevel * 5000)})</button>
-                                    </div>
-                                </div>
+                                <h3 style="border-bottom:1px solid #334155; padding-bottom:10px; margin: 25px 0 20px 0;">📦 Proveedores (Insumos)</h3>
+                                <div class="options-grid">${provOpts}</div>
                             </div>
                         `;
 
@@ -6185,19 +6306,89 @@ var UI = {
                     const comp = stats.demandComposition || { base: 0, traffic: 1, marketing: 1, reputation: 1, organic: 1 };
 
                     let mktOpts = '';
+                    const channelIcons = { 'none': '🚫', 'social': '📱', 'local': '📻', 'influencers': '⭐' };
+                    const channelColors = { 'none': '#64748b', 'social': '#38bdf8', 'local': '#fbbf24', 'influencers': '#a855f7' };
+
                     for (const [k, v] of Object.entries(CompanyModule.marketingChannels)) {
                         const isSel = co.marketingChannel === k;
-                        mktOpts += `<div class="selection-card ${isSel ? 'selected' : ''}" onclick="setStrat('marketing', '${k}')">
-                                <strong>${v.name}</strong><br>Coste: ${formatCurrency(v.cost)}/mes<br>Impacto: x${v.impact}
+                        const icon = channelIcons[k] || '📢';
+                        const color = channelColors[k] || '#94a3b8';
+
+                        mktOpts += `
+                            <div class="selection-card ${isSel ? 'selected' : ''}" onclick="setStrat('marketing', '${k}')" style="
+                                display: flex;
+                                flex-direction: column;
+                                align-items: center;
+                                text-align: center;
+                                gap: 10px;
+                                padding: 20px 15px;
+                                min-height: 140px;
+                                ${isSel ? `border-color: ${color}; box-shadow: 0 0 15px ${color}33;` : ''}
+                            ">
+                                <div style="font-size: 2rem; filter: ${isSel ? 'none' : 'grayscale(0.5)'};">${icon}</div>
+                                <div style="font-weight: 700; color: ${isSel ? color : '#fff'}; font-size: 0.95rem;">${v.name}</div>
+                                <div style="display: flex; flex-direction: column; gap: 4px; font-size: 0.8rem; color: #94a3b8;">
+                                    <span>💰 ${v.cost === 0 ? 'Gratis' : formatCurrency(v.cost) + '/mes'}</span>
+                                    <span style="color: ${v.impact > 1 ? '#4ade80' : '#64748b'};">📈 Impacto x${v.impact}</span>
+                                </div>
                             </div>`;
                     }
 
                     const strategyHTML = `
                                 <div class="comp-dash-container">
-                                    <h3 style="border-bottom:1px solid #334155; padding-bottom:5px; margin-bottom:15px;">📡 Canales de Publicidad</h3>
-                                    <div class="options-grid" style="margin-bottom:20px;">${mktOpts}</div>
+                                    <div style="
+                                        background: linear-gradient(145deg, rgba(251, 191, 36, 0.1), rgba(245, 158, 11, 0.05));
+                                        border: 1px solid rgba(251, 191, 36, 0.3);
+                                        border-radius: 16px;
+                                        padding: 25px;
+                                        margin-bottom: 30px;
+                                    ">
+                                        <div style="display: flex; align-items: flex-start; gap: 20px; flex-wrap: wrap;">
+                                            <div style="
+                                                width: 60px; height: 60px;
+                                                background: linear-gradient(135deg, #fbbf24, #f59e0b);
+                                                border-radius: 16px;
+                                                display: flex; align-items: center; justify-content: center;
+                                                font-size: 1.8rem;
+                                                box-shadow: 0 4px 15px rgba(251, 191, 36, 0.3);
+                                                flex-shrink: 0;
+                                            ">📣</div>
+                                            <div style="flex: 1; min-width: 200px;">
+                                                <h3 style="margin: 0 0 8px 0; color: #fbbf24; font-size: 1.1rem;">Infraestructura de Marketing</h3>
+                                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                                    <span style="color: #fff; font-weight: 800; font-size: 1.5rem;">Nivel ${co.marketingLevel}</span>
+                                                    <span style="color: #64748b; font-size: 0.85rem;">/ 10</span>
+                                                </div>
+                                                <div style="background: #0f172a; border-radius: 8px; height: 10px; overflow: hidden; margin-bottom: 12px;">
+                                                    <div style="width: ${co.marketingLevel * 10}%; height: 100%; background: linear-gradient(90deg, #fbbf24, #f59e0b); border-radius: 8px; transition: width 0.3s;"></div>
+                                                </div>
+                                                <p style="color: #94a3b8; font-size: 0.85rem; margin: 0;">
+                                                    Cada nivel aumenta la <strong style="color: #fbbf24;">eficacia +20%</strong> → Más clientes.
+                                                </p>
+                                            </div>
+                                            <button onclick="investCo('marketing_infra')" style="
+                                                background: linear-gradient(135deg, #fbbf24, #f59e0b);
+                                                color: #0f172a;
+                                                border: none;
+                                                padding: 14px 28px;
+                                                border-radius: 12px;
+                                                font-weight: 800;
+                                                font-size: 0.95rem;
+                                                cursor: pointer;
+                                                box-shadow: 0 4px 15px rgba(251, 191, 36, 0.3);
+                                                transition: all 0.2s;
+                                                white-space: nowrap;
+                                            "
+                                            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(251, 191, 36, 0.4)'"
+                                            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(251, 191, 36, 0.3)'"
+                                            >⬆️ Mejorar (${formatCurrency(co.marketingLevel * 5000)})</button>
+                                        </div>
+                                    </div>
+                                    
+                                    <h3 style="border-bottom:1px solid #334155; padding-bottom:10px; margin-bottom:20px; font-size: 1.1rem;">📡 Canales de Publicidad</h3>
+                                    <div class="options-grid" style="margin-bottom:25px; display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px;">${mktOpts}</div>
 
-                                    <div class="strat-card highlight" style="margin-bottom:25px;">
+                                    <div class="strat-card highlight">
                                         <h4 class="staff-role-title" style="color:#38bdf8;">📈 Análisis de Demanda</h4>
                                         <div class="analysis-box" style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
                                             <div class="data-row"><span>Base:</span> <strong>${comp.base}</strong></div>
@@ -6211,17 +6402,6 @@ var UI = {
                                             </div>
                                         </div>
                                     </div>
-
-                                    <h3 style="border-bottom:1px solid #334155; padding-bottom:5px; margin-bottom:15px;">🚀 Infraestructura de Marketing</h3>
-                                    <div class="invest-grid">
-                                        <div class="invest-card">
-                                            <div>
-                                                <h4 class="staff-role-title">Marketing (Nivel ${co.marketingLevel})</h4>
-                                                <p style="color:#94a3b8; font-size:0.9rem; margin-top:5px;">Potencia la eficacia (+20%) de todas las campañas activas.</p>
-                                            </div>
-                                            <button onclick="investCo('marketing_infra')" class="btn-action-primary" style="width:100%; margin-top:10px;">Invertir (${formatCurrency(co.marketingLevel * 5000)})</button>
-                                        </div>
-                                    </div>
                                 </div>
                             `;
                     tabContent.innerHTML = strategyHTML;
@@ -6232,46 +6412,163 @@ var UI = {
 
                 } else if (activeTab === 'finance') {
                     tabContent.innerHTML = `
-                                <div class="comp-dash-container">
-                                    <div class="fin-panel">
-                                        <div class="fin-section">
-                                            <h3 class="staff-role-title">💰 Movimientos de Caja</h3>
-                                            <div class="fin-control-group">
-                                                <div style="flex:1;">
-                                                    <label style="display:block; margin-bottom:5px; color:#cbd5e1; font-size:0.9rem;">Retirar Fondos (a cuenta personal)</label>
-                                                    <div style="display:flex; gap:10px;">
-                                                        <input type="number" id="co-trans-amount" placeholder="Cantidad" class="comp-input-lg">
-                                                        <button id="btn-withdraw" class="btn-action-primary">Retirar</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="fin-control-group">
-                                                 <div style="flex:1;">
-                                                    <label style="display:block; margin-bottom:5px; color:#cbd5e1; font-size:0.9rem;">Inyectar Capital (desde cuenta personal)</label>
-                                                    <div style="display:flex; gap:10px;">
-                                                        <input type="number" id="co-dep-amount" placeholder="Cantidad" class="comp-input-lg">
-                                                        <button id="btn-deposit" class="btn-action-primary">Ingresar</button>
-                                                    </div>
-                                                </div>
-                                            </div>
+                        <div style="display: flex; flex-direction: column; gap: 20px;">
+                            
+                            <!-- Cash Movements Card -->
+                            <div style="
+                                background: linear-gradient(145deg, rgba(56, 189, 248, 0.1), rgba(14, 165, 233, 0.05));
+                                border: 1px solid rgba(56, 189, 248, 0.3);
+                                border-radius: 16px;
+                                padding: 25px;
+                            ">
+                                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+                                    <div style="
+                                        width: 50px; height: 50px;
+                                        background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+                                        border-radius: 14px;
+                                        display: flex; align-items: center; justify-content: center;
+                                        font-size: 1.5rem;
+                                        box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
+                                    ">💰</div>
+                                    <div>
+                                        <h3 style="margin: 0; color: #38bdf8; font-size: 1.1rem;">Movimientos de Caja</h3>
+                                        <p style="margin: 4px 0 0 0; color: #64748b; font-size: 0.8rem;">Transfiere fondos entre empresa y cuenta personal</p>
+                                    </div>
+                                </div>
+                                
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                                    <div style="background: rgba(15, 23, 42, 0.5); border-radius: 12px; padding: 15px;">
+                                        <label style="display:block; margin-bottom:8px; color:#4ade80; font-weight: 600; font-size:0.9rem;">📤 Retirar a cuenta personal</label>
+                                        <div style="display:flex; gap:10px;">
+                                            <input type="number" id="co-trans-amount" placeholder="Cantidad €" style="
+                                                flex: 1;
+                                                background: #0f172a;
+                                                border: 1px solid #334155;
+                                                padding: 12px;
+                                                border-radius: 8px;
+                                                color: white;
+                                                font-size: 1rem;
+                                            ">
+                                            <button id="btn-withdraw" style="
+                                                background: linear-gradient(135deg, #4ade80, #22c55e);
+                                                color: #0f172a;
+                                                border: none;
+                                                padding: 12px 20px;
+                                                border-radius: 8px;
+                                                font-weight: 700;
+                                                cursor: pointer;
+                                            ">Retirar</button>
                                         </div>
-
-                                        <div class="fin-section">
-                                            <h3 class="staff-role-title">💼 Salario del CEO</h3>
-                                            <p style="color:#94a3b8; font-size:0.9rem; margin-bottom:10px;">Tu sueldo mensual (Cubre tus gastos personales)</p>
-                                            <div style="display:flex; gap:10px;">
-                                                <input type="number" id="co-ceo-salary" value="${co.ceoSalary || 0}" class="comp-input-lg" style="max-width:200px;">
-                                                <button id="btn-set-salary" class="btn-action-primary">Actualizar</button>
-                                            </div>
-                                        </div>
-
-                                        <div class="fin-section" style="border-bottom:none; margin-bottom:0;">
-                                            <h3 class="staff-role-title" style="color:#ef4444;">⚠️ Zona de Peligro</h3>
-                                            <p style="color:#94a3b8; font-size:0.9rem; margin-bottom:15px;">Esta acción es irreversible.</p>
-                                            <button onclick="sellCompanyAction()" class="btn-action-danger">VENDER EMPRESA (EXIT)</button>
+                                    </div>
+                                    <div style="background: rgba(15, 23, 42, 0.5); border-radius: 12px; padding: 15px;">
+                                        <label style="display:block; margin-bottom:8px; color:#a855f7; font-weight: 600; font-size:0.9rem;">📥 Inyectar desde cuenta personal</label>
+                                        <div style="display:flex; gap:10px;">
+                                            <input type="number" id="co-dep-amount" placeholder="Cantidad €" style="
+                                                flex: 1;
+                                                background: #0f172a;
+                                                border: 1px solid #334155;
+                                                padding: 12px;
+                                                border-radius: 8px;
+                                                color: white;
+                                                font-size: 1rem;
+                                            ">
+                                            <button id="btn-deposit" style="
+                                                background: linear-gradient(135deg, #a855f7, #7c3aed);
+                                                color: white;
+                                                border: none;
+                                                padding: 12px 20px;
+                                                border-radius: 8px;
+                                                font-weight: 700;
+                                                cursor: pointer;
+                                            ">Ingresar</button>
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+                            
+                            <!-- CEO Salary Card -->
+                            <div style="
+                                background: linear-gradient(145deg, rgba(251, 191, 36, 0.1), rgba(245, 158, 11, 0.05));
+                                border: 1px solid rgba(251, 191, 36, 0.3);
+                                border-radius: 16px;
+                                padding: 25px;
+                            ">
+                                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                                    <div style="
+                                        width: 50px; height: 50px;
+                                        background: linear-gradient(135deg, #fbbf24, #f59e0b);
+                                        border-radius: 14px;
+                                        display: flex; align-items: center; justify-content: center;
+                                        font-size: 1.5rem;
+                                        box-shadow: 0 4px 15px rgba(251, 191, 36, 0.3);
+                                    ">💼</div>
+                                    <div>
+                                        <h3 style="margin: 0; color: #fbbf24; font-size: 1.1rem;">Salario del CEO</h3>
+                                        <p style="margin: 4px 0 0 0; color: #64748b; font-size: 0.8rem;">Tu sueldo mensual (cubre gastos personales)</p>
+                                    </div>
+                                </div>
+                                <div style="display:flex; gap:10px; align-items: center;">
+                                    <input type="number" id="co-ceo-salary" value="${co.ceoSalary || 0}" style="
+                                        width: 150px;
+                                        background: #0f172a;
+                                        border: 1px solid #334155;
+                                        padding: 12px;
+                                        border-radius: 8px;
+                                        color: white;
+                                        font-size: 1.1rem;
+                                        font-weight: 700;
+                                        text-align: center;
+                                    ">
+                                    <span style="color: #64748b;">€ / mes</span>
+                                    <button id="btn-set-salary" style="
+                                        background: linear-gradient(135deg, #fbbf24, #f59e0b);
+                                        color: #0f172a;
+                                        border: none;
+                                        padding: 12px 25px;
+                                        border-radius: 8px;
+                                        font-weight: 700;
+                                        cursor: pointer;
+                                        margin-left: auto;
+                                    ">Actualizar</button>
+                                </div>
+                            </div>
+                            
+                            <!-- Danger Zone Card -->
+                            <div style="
+                                background: linear-gradient(145deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.05));
+                                border: 1px solid rgba(239, 68, 68, 0.3);
+                                border-radius: 16px;
+                                padding: 25px;
+                            ">
+                                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                                    <div style="
+                                        width: 50px; height: 50px;
+                                        background: linear-gradient(135deg, #ef4444, #dc2626);
+                                        border-radius: 14px;
+                                        display: flex; align-items: center; justify-content: center;
+                                        font-size: 1.5rem;
+                                        box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+                                    ">⚠️</div>
+                                    <div>
+                                        <h3 style="margin: 0; color: #ef4444; font-size: 1.1rem;">Zona de Peligro</h3>
+                                        <p style="margin: 4px 0 0 0; color: #64748b; font-size: 0.8rem;">Acciones irreversibles</p>
+                                    </div>
+                                </div>
+                                <button onclick="sellCompanyAction()" style="
+                                    background: transparent;
+                                    color: #ef4444;
+                                    border: 2px solid #ef4444;
+                                    padding: 12px 25px;
+                                    border-radius: 8px;
+                                    font-weight: 700;
+                                    cursor: pointer;
+                                    transition: all 0.2s;
+                                "
+                                onmouseover="this.style.background='rgba(239, 68, 68, 0.1)'"
+                                onmouseout="this.style.background='transparent'"
+                                >🏷️ VENDER EMPRESA (EXIT)</button>
+                            </div>
+                        </div>
             `;
 
                     document.getElementById('btn-withdraw').onclick = () => {
