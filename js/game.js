@@ -3627,13 +3627,26 @@ var UI = {
 
             // Check Funds Condition
             const canAfford = GameState.cash >= val.cost;
-            const isAffordable = canAfford || isLocked; // If locked, affordability doesn't matter for the "locked" state display, but for clarity let's treat insufficient funds as a separate state if not locked.
+            const isComingSoon = (key !== 'cafe');
+            const isDisabled = isLocked || !canAfford || isComingSoon;
 
             const card = document.createElement('div');
-            // Add 'locked' class if either condition is met
-            card.className = `biz-model-card ${isLocked || !canAfford ? 'locked' : ''}`;
+            // Add 'locked' class if any blocking condition is met
+            card.className = `biz-model-card ${isDisabled ? 'locked' : ''}`;
 
-            if (isLocked) {
+            if (isComingSoon) {
+                card.innerHTML = `
+                            <div style="text-align: center;">
+                                <div style="font-size: 2.5rem; margin-bottom: 10px; filter: grayscale(1); opacity:0.6;">${val.icon}</div>
+                                <div style="font-size: 1.1rem; font-weight: 700; color: #64748b; margin-bottom: 8px;">${val.name}</div>
+                                <span style="display: inline-block; background: #334155; color: #94a3b8; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;">En Desarrollo</span>
+                            </div>
+                            <div style="margin-top: 15px; padding: 12px; border-radius: 10px; border: 1px dashed #475569; text-align: center;">
+                                <div style="font-size: 0.9rem; color: #fbbf24; font-weight:600;">🚧 Próximamente...</div>
+                            </div>
+                        `;
+
+            } else if (isLocked) {
                 // ... Existing Locked Logic ...
                 card.innerHTML = `
                             <div style="text-align: center;">
