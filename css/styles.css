@@ -3080,6 +3080,13 @@
                 font-size: 0.75rem !important;
                 margin: 0;
             }
+            
+            .kpi-sub {
+                font-size: 0.7rem !important;
+                display: block !important;
+                margin-top: 4px !important;
+                word-break: break-word !important;
+            }
 
             /* Typography sizes */
             h1 {

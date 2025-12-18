@@ -2633,7 +2633,7 @@ var UI = {
                 <div class="kpi-box" style="border-bottom: 2px solid #38bdf8;">
                     <div class="kpi-label">Flujo Mensual</div>
                     <div class="kpi-value" style="color:${monthlyFlow >= 0 ? '#38bdf8' : '#f87171'}">${monthlyFlow >= 0 ? '+' : ''}${formatCurrency(monthlyFlow)}</div>
-                    <div class="kpi-sub">Ing: ${formatCurrency(totalIncome)} | Gas: ${formatCurrency(totalExpenses)}</div>
+                    <div class="kpi-sub">Ing: ${formatCurrency(totalIncome)}<br>Gas: ${formatCurrency(totalExpenses)}</div>
                 </div>
             </div>
 
