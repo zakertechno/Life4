@@ -1501,9 +1501,9 @@ var CompanyModule = {
         'tech_startup': { name: 'Startup SaaS', cost: 750000, baseDemand: 100, baseTicket: 100, cogsPct: 0.05, productivityPerStaff: 200, volatility: 0.6, tier: 2, baseWage: 3000, icon: '💻', baseRent: 2000 }
     },
     locations: {
-        'suburbs': { name: 'Afueras', rentMult: 0.5, trafficMult: 0.8 },
-        'downtown': { name: 'Centro Ciudad', rentMult: 1.5, trafficMult: 1.0 },
-        'business_district': { name: 'Distrito Financiero', rentMult: 3.0, trafficMult: 1.2 }
+        'suburbs': { name: 'Afueras', rentMult: 0.5, trafficMult: 0.8, maxStaff: 10 },
+        'downtown': { name: 'Centro Ciudad', rentMult: 1.5, trafficMult: 1.0, maxStaff: 15 },
+        'business_district': { name: 'Distrito Financiero', rentMult: 3.0, trafficMult: 1.2, maxStaff: 20 }
     },
     providers: {
         'cheap': { name: 'Mayorista Low-Cost', priceMod: 0.8, quality: 0.4, reliability: 0.7 },
@@ -1597,16 +1597,28 @@ var CompanyModule = {
     upgradeOffice() {
         if (!GameState.company) return;
         const co = GameState.company;
+        const loc = this.locations[co.locationId];
+        const locationMaxStaff = loc?.maxStaff || 15;
+
+        // Check if already at location max
+        if (co.maxStaff >= locationMaxStaff) {
+            return { success: false, message: `Ya tienes el máximo de oficina para ${co.locationName} (${locationMaxStaff} empleados).` };
+        }
 
         let nextLimit = 0;
-        let costMultiplier = 0;
+        let baseCost = 0;
 
-        if (co.maxStaff === 5) { nextLimit = 10; costMultiplier = 3; }
-        else if (co.maxStaff === 10) { nextLimit = 15; costMultiplier = 3; }
+        if (co.maxStaff === 5) { nextLimit = 10; baseCost = 15000; }
+        else if (co.maxStaff === 10) { nextLimit = 15; baseCost = 30000; }
+        else if (co.maxStaff === 15) { nextLimit = 20; baseCost = 60000; }
         else return { success: false, message: 'Ya tienes la oficina máxima.' };
 
-        const baseCost = nextLimit === 10 ? 15000 : 30000;
-        const profitCalc = Math.max(0, co.profitLastMonth) * costMultiplier;
+        // Ensure next limit doesn't exceed location max
+        if (nextLimit > locationMaxStaff) {
+            return { success: false, message: `La ubicación ${co.locationName} permite máximo ${locationMaxStaff} empleados.` };
+        }
+
+        const profitCalc = Math.max(0, co.profitLastMonth) * 3;
         const finalCost = Math.max(baseCost, profitCalc);
 
         if (co.cash < finalCost) return { success: false, message: `Faltan fondos. Coste: ${formatCurrency(finalCost)}` };
@@ -1620,8 +1632,13 @@ var CompanyModule = {
     hireManager() {
         if (!GameState.company) return;
         const co = GameState.company;
+        const loc = this.locations[co.locationId];
+        const locationMaxStaff = loc?.maxStaff || 15;
 
-        if (co.staff.length < 15 || co.maxStaff < 15) return { success: false, message: 'Necesitas una empresa completa (15 empleados).' };
+        // Check if company is at max capacity for this location
+        if (co.staff.length < locationMaxStaff || co.maxStaff < locationMaxStaff) {
+            return { success: false, message: `Necesitas una empresa completa (${locationMaxStaff} empleados) para automatizar en ${co.locationName}.` };
+        }
 
         const cost = Math.max(30000, co.profitLastMonth * 3);
         if (co.cash < cost) return { success: false, message: `Necesitas ${formatCurrency(cost)} para contratar al Gerente y automatizar.` };
@@ -5497,14 +5514,16 @@ var UI = {
                                             <div style="font-size: 1.2rem; font-weight: 800; color: ${co.profitLastMonth >= 0 ? '#4ade80' : '#f87171'};">${co.profitLastMonth >= 0 ? '+' : ''}${formatCurrency(co.profitLastMonth)}</div>
                                         </div>
                                         ${(() => {
+                        const loc = CompanyModule.locations[co.locationId];
+                        const locationMaxStaff = loc?.maxStaff || 15;
                         const autoCost = Math.max(30000, (co.profitLastMonth || 0) * 3);
-                        const hasStaff = co.staff.length >= 15;
+                        const hasStaff = co.staff.length >= locationMaxStaff && co.maxStaff >= locationMaxStaff;
                         const hasMoney = co.cash >= autoCost;
 
                         const canAffordAuto = hasMoney && hasStaff;
 
                         let reqText = '';
-                        if (!hasStaff) reqText = `Req: 15 Empleados (${co.staff.length}/15)`;
+                        if (!hasStaff) reqText = `Req: ${locationMaxStaff} Empleados (${co.staff.length}/${locationMaxStaff})`;
                         else if (!hasMoney) reqText = `Req: ${formatCurrency(autoCost)} (Caja: ${formatCurrency(co.cash)})`;
 
                         return `
@@ -5742,14 +5761,23 @@ var UI = {
                     let upgradeText = "Ampliar Oficina";
                     let upgradeDisabled = "";
 
-                    if (co.maxStaff === 5) upgradeCost = Math.max(15000, (co.profitLastMonth || 0) * 3);
-                    else if (co.maxStaff === 10) upgradeCost = Math.max(30000, (co.profitLastMonth || 0) * 3);
-                    else {
-                        upgradeText = "Máximo Alcanzado";
-                        upgradeDisabled = "disabled style='opacity:0.5; cursor:not-allowed;'";
+                    // Get location-based max staff
+                    const loc = CompanyModule.locations[co.locationId];
+                    const locationMaxStaff = loc?.maxStaff || 15;
+
+                    // Check if at location max
+                    if (co.maxStaff >= locationMaxStaff) {
+                        upgradeText = `Máximo (${locationMaxStaff})`;
+                        upgradeDisabled = "disabled";
+                    } else if (co.maxStaff === 5) {
+                        upgradeCost = Math.max(15000, (co.profitLastMonth || 0) * 3);
+                    } else if (co.maxStaff === 10) {
+                        upgradeCost = Math.max(30000, (co.profitLastMonth || 0) * 3);
+                    } else if (co.maxStaff === 15) {
+                        upgradeCost = Math.max(60000, (co.profitLastMonth || 0) * 3);
                     }
 
-                    if (!upgradeDisabled) {
+                    if (!upgradeDisabled && upgradeCost > 0) {
                         upgradeText += ` (${formatCurrency(upgradeCost)})`;
                     }
 
@@ -6229,22 +6257,76 @@ var UI = {
                                                 Cada nivel aumenta la <strong style="color: #4ade80;">calidad base +5%</strong> → Mayor satisfacción.
                                             </p>
                                         </div>
-                                        <button onclick="investCo('product_dev')" style="
-                                            background: linear-gradient(135deg, #4ade80, #22c55e);
-                                            color: #0f172a;
-                                            border: none;
-                                            padding: 14px 28px;
-                                            border-radius: 12px;
-                                            font-weight: 800;
-                                            font-size: 0.95rem;
-                                            cursor: pointer;
-                                            box-shadow: 0 4px 15px rgba(74, 222, 128, 0.3);
-                                            transition: all 0.2s;
-                                            white-space: nowrap;
-                                        "
-                                        onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(74, 222, 128, 0.4)'"
-                                        onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(74, 222, 128, 0.3)'"
-                                        >⬆️ Mejorar (${formatCurrency(co.productLevel * 5000)})</button>
+                                        ${(() => {
+                            const productCost = co.productLevel * 5000;
+                            const canAfford = co.cash >= productCost;
+                            const isMaxLevel = co.productLevel >= 10;
+                            const needsMoreStaff = co.productLevel >= co.staff.length;
+                            const requiredStaff = co.productLevel + 1;
+
+                            if (isMaxLevel) {
+                                return `<div style="padding: 14px 28px; border-radius: 12px; background: #334155; color: #64748b; font-weight: 700; text-align: center;">✓ Nivel Máximo</div>`;
+                            }
+
+                            if (needsMoreStaff) {
+                                return `<button disabled style="
+                                                    background: #334155;
+                                                    color: #64748b;
+                                                    border: none;
+                                                    padding: 14px 28px;
+                                                    border-radius: 12px;
+                                                    font-weight: 700;
+                                                    font-size: 0.85rem;
+                                                    cursor: not-allowed;
+                                                    opacity: 0.8;
+                                                    display: flex;
+                                                    flex-direction: column;
+                                                    align-items: center;
+                                                    gap: 4px;
+                                                ">
+                                                    <span>🔒 Req: ${requiredStaff} empleados</span>
+                                                    <span style="font-size: 0.7rem; color: #fbbf24;">Tienes: ${co.staff.length} 👥</span>
+                                                </button>`;
+                            }
+
+                            if (!canAfford) {
+                                return `<button disabled style="
+                                                    background: #334155;
+                                                    color: #64748b;
+                                                    border: none;
+                                                    padding: 14px 28px;
+                                                    border-radius: 12px;
+                                                    font-weight: 700;
+                                                    font-size: 0.85rem;
+                                                    cursor: not-allowed;
+                                                    opacity: 0.8;
+                                                    display: flex;
+                                                    flex-direction: column;
+                                                    align-items: center;
+                                                    gap: 4px;
+                                                ">
+                                                    <span>🔒 ${formatCurrency(productCost)}</span>
+                                                    <span style="font-size: 0.7rem; color: #f87171;">Caja: ${formatCurrency(co.cash)}</span>
+                                                </button>`;
+                            }
+
+                            return `<button onclick="investCo('product_dev')" style="
+                                                background: linear-gradient(135deg, #4ade80, #22c55e);
+                                                color: #0f172a;
+                                                border: none;
+                                                padding: 14px 28px;
+                                                border-radius: 12px;
+                                                font-weight: 800;
+                                                font-size: 0.95rem;
+                                                cursor: pointer;
+                                                box-shadow: 0 4px 15px rgba(74, 222, 128, 0.3);
+                                                transition: all 0.2s;
+                                                white-space: nowrap;
+                                            "
+                                            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(74, 222, 128, 0.4)'"
+                                            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(74, 222, 128, 0.3)'"
+                                            >⬆️ Mejorar (${formatCurrency(productCost)})</button>`;
+                        })()}
                                     </div>
                                 </div>
                                 
@@ -6366,22 +6448,76 @@ var UI = {
                                                     Cada nivel aumenta la <strong style="color: #fbbf24;">eficacia +20%</strong> → Más clientes.
                                                 </p>
                                             </div>
-                                            <button onclick="investCo('marketing_infra')" style="
-                                                background: linear-gradient(135deg, #fbbf24, #f59e0b);
-                                                color: #0f172a;
-                                                border: none;
-                                                padding: 14px 28px;
-                                                border-radius: 12px;
-                                                font-weight: 800;
-                                                font-size: 0.95rem;
-                                                cursor: pointer;
-                                                box-shadow: 0 4px 15px rgba(251, 191, 36, 0.3);
-                                                transition: all 0.2s;
-                                                white-space: nowrap;
-                                            "
-                                            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(251, 191, 36, 0.4)'"
-                                            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(251, 191, 36, 0.3)'"
-                                            >⬆️ Mejorar (${formatCurrency(co.marketingLevel * 5000)})</button>
+                                            ${(() => {
+                            const mktCost = co.marketingLevel * 5000;
+                            const canAfford = co.cash >= mktCost;
+                            const isMaxLevel = co.marketingLevel >= 10;
+                            const needsMoreStaff = co.marketingLevel >= co.staff.length;
+                            const requiredStaff = co.marketingLevel + 1;
+
+                            if (isMaxLevel) {
+                                return `<div style="padding: 14px 28px; border-radius: 12px; background: #334155; color: #64748b; font-weight: 700; text-align: center;">✓ Nivel Máximo</div>`;
+                            }
+
+                            if (needsMoreStaff) {
+                                return `<button disabled style="
+                                                        background: #334155;
+                                                        color: #64748b;
+                                                        border: none;
+                                                        padding: 14px 28px;
+                                                        border-radius: 12px;
+                                                        font-weight: 700;
+                                                        font-size: 0.85rem;
+                                                        cursor: not-allowed;
+                                                        opacity: 0.8;
+                                                        display: flex;
+                                                        flex-direction: column;
+                                                        align-items: center;
+                                                        gap: 4px;
+                                                    ">
+                                                        <span>🔒 Req: ${requiredStaff} empleados</span>
+                                                        <span style="font-size: 0.7rem; color: #fbbf24;">Tienes: ${co.staff.length} 👥</span>
+                                                    </button>`;
+                            }
+
+                            if (!canAfford) {
+                                return `<button disabled style="
+                                                        background: #334155;
+                                                        color: #64748b;
+                                                        border: none;
+                                                        padding: 14px 28px;
+                                                        border-radius: 12px;
+                                                        font-weight: 700;
+                                                        font-size: 0.85rem;
+                                                        cursor: not-allowed;
+                                                        opacity: 0.8;
+                                                        display: flex;
+                                                        flex-direction: column;
+                                                        align-items: center;
+                                                        gap: 4px;
+                                                    ">
+                                                        <span>🔒 ${formatCurrency(mktCost)}</span>
+                                                        <span style="font-size: 0.7rem; color: #f87171;">Caja: ${formatCurrency(co.cash)}</span>
+                                                    </button>`;
+                            }
+
+                            return `<button onclick="investCo('marketing_infra')" style="
+                                                    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+                                                    color: #0f172a;
+                                                    border: none;
+                                                    padding: 14px 28px;
+                                                    border-radius: 12px;
+                                                    font-weight: 800;
+                                                    font-size: 0.95rem;
+                                                    cursor: pointer;
+                                                    box-shadow: 0 4px 15px rgba(251, 191, 36, 0.3);
+                                                    transition: all 0.2s;
+                                                    white-space: nowrap;
+                                                "
+                                                onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(251, 191, 36, 0.4)'"
+                                                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(251, 191, 36, 0.3)'"
+                                                >⬆️ Mejorar (${formatCurrency(mktCost)})</button>`;
+                        })()}
                                         </div>
                                     </div>
                                     
