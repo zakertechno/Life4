@@ -6448,12 +6448,19 @@ try {
             };
         });
 
-        document.getElementById('btn-new-game-saved').onclick = () => {
-            if (confirm('¿Iniciar nueva partida?')) {
-                document.querySelector('.custom-modal-overlay').remove();
+        document.getElementById('btn-new-game-saved').onclick = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            // First close the welcome modal
+            const welcomeModal = document.querySelector('.custom-modal-overlay');
+            if (welcomeModal) welcomeModal.remove();
+
+            // Then show confirmation modal
+            UI.confirmModal('Nueva Partida', '¿Estás seguro de que quieres iniciar una nueva partida? Tu progreso no guardado se perderá.', () => {
                 promptNewUser(initGame);
-            }
+            });
         };
+
     } else {
         promptNewUser(initGame);
     }
