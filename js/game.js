@@ -3555,10 +3555,6 @@ var UI = {
                 if (state.locId) {
                     const loc = CompanyModule.locations[state.locId];
                     rentCost = type.baseRent * loc.rentMult;
-                } else {
-                    // Show base rent range or just base?
-                    // Let's show base rent as "Desde"
-                    // For simplicity, 0 until selected.
                 }
             }
 
@@ -3575,14 +3571,10 @@ var UI = {
                 summaryTotal.style.color = '#f87171'; // Red
                 errorMsg.style.display = 'block';
                 btnNext.disabled = true;
-                btnNext.style.opacity = '0.5';
-                btnNext.style.cursor = 'not-allowed';
             } else {
                 summaryTotal.style.color = '#f8fafc';
                 errorMsg.style.display = 'none';
                 btnNext.disabled = false;
-                btnNext.style.opacity = '1';
-                btnNext.style.cursor = 'pointer';
             }
         };
 
@@ -3604,7 +3596,7 @@ var UI = {
             card.className = `biz-model-card ${isLocked ? 'locked' : ''}`;
 
             if (isLocked) {
-                card.style.cssText = 'opacity: 0.6; cursor: not-allowed; filter: grayscale(0.8); background: linear-gradient(145deg, #1e293b, #0f172a); border: 1px solid #334155; border-radius: 16px; padding: 20px;';
+                // Locked Card Stlyes are handled by CSS .biz-model-card.locked
                 card.innerHTML = `
                             <div style="text-align: center;">
                                 <div style="font-size: 2.5rem; margin-bottom: 10px; filter: grayscale(1);">🔒</div>
@@ -3624,7 +3616,7 @@ var UI = {
                 const riskBorder = volatility > 0.3 ? 'rgba(248, 113, 113, 0.3)' : 'rgba(74, 222, 128, 0.3)';
                 const riskText = volatility > 0.3 ? '⚡ Alto Riesgo' : '✓ Estable';
 
-                card.style.cssText = 'background: linear-gradient(145deg, #1e293b, #0f172a); border: 1px solid #334155; border-radius: 16px; padding: 20px; cursor: pointer; transition: all 0.2s;';
+                // Styles now handled by CSS .biz-model-card
                 card.innerHTML = `
                             <div style="text-align: center; margin-bottom: 15px;">
                                 <div style="font-size: 3rem; margin-bottom: 10px; filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.3));">${icon}</div>
@@ -3684,6 +3676,7 @@ var UI = {
 
             const card = document.createElement('div');
             card.className = 'loc-tier-card';
+            if (isLocked) card.classList.add('locked');
 
             // Get location icon based on key
             const getLocIcon = (locKey) => {
@@ -3691,13 +3684,6 @@ var UI = {
                 return icons[locKey] || '📍';
             };
             const locIcon = getLocIcon(key);
-
-            // Premium styling based on locked status
-            if (isLocked) {
-                card.style.cssText = 'opacity: 0.6; cursor: not-allowed; filter: grayscale(0.7); background: linear-gradient(145deg, #1e293b, #0f172a); border: 1px solid #334155; border-radius: 16px; padding: 20px;';
-            } else {
-                card.style.cssText = 'background: linear-gradient(145deg, #1e293b, #0f172a); border: 1px solid #334155; border-radius: 16px; padding: 20px; cursor: pointer; transition: all 0.2s;';
-            }
 
             // Traffic color based on multiplier
             const trafficColor = val.trafficMult >= 1.5 ? '#4ade80' : val.trafficMult >= 1.0 ? '#fbbf24' : '#f87171';
@@ -3765,12 +3751,26 @@ var UI = {
         // NAVIGATION LOGIC
         const showStep = (step) => {
             currentStep = step;
+            // Get Steps by ID
+            const step1Container = document.getElementById('wizard-step-1');
+            const step2Container = document.getElementById('wizard-step-2');
+
+            // Get Progress Indicators
+            const badge2 = document.getElementById('wiz-step-dot-2');
+            const label2 = document.getElementById('wiz-step-label-2');
+            const line2 = document.getElementById('wiz-step-bar-2');
 
             if (step === 1) {
-                step1.style.display = 'block';
-                step2.style.display = 'none';
-                bar2.style.width = '0%';
-                dot2.classList.remove('active');
+                step1Container.style.display = 'block';
+                step2Container.style.display = 'none';
+
+                // Progress Update
+                line2.style.width = '0%';
+                badge2.classList.remove('active');
+                badge2.classList.add('inactive');
+                label2.classList.remove('active');
+                label2.classList.add('inactive');
+
                 btnBack.style.display = 'none';
                 btnNext.textContent = 'Siguiente ➡️';
                 btnNext.onclick = goNext;
@@ -3780,10 +3780,16 @@ var UI = {
                 btnNextMobile.textContent = 'Siguiente ➡️';
                 btnNextMobile.onclick = goNext;
             } else if (step === 2) {
-                step1.style.display = 'none';
-                step2.style.display = 'block';
-                bar2.style.width = '100%';
-                dot2.classList.add('active');
+                step1Container.style.display = 'none';
+                step2Container.style.display = 'block';
+
+                // Progress Update
+                line2.style.width = '100%';
+                badge2.classList.remove('inactive');
+                badge2.classList.add('active');
+                label2.classList.remove('inactive');
+                label2.classList.add('active');
+
                 btnBack.style.display = 'block';
                 btnNext.textContent = '🌵 Fundar Empresa';
                 btnNext.onclick = finishWizard;
@@ -5596,17 +5602,37 @@ var UI = {
                     const expertBtnText = expertLocked ? `Experto (1.8k) 🔒 Req: Nv.5` : 'Experto (1.8k)';
 
 
+                    // RENDER STAFF CARDS
                     co.staff.forEach((emp, i) => {
                         staffHtml += `
-                                <div class="staff-row">
-                                    <div>
-                                        <strong>${emp.role}</strong><br>
-                                        <span style="font-size:0.8rem">Habilidad: ${(emp.skill * 100).toFixed(0)}% | Moral: ${(emp.morale * 100).toFixed(0)}%</span>
+                                <div class="staff-card">
+                                    <div class="staff-header-row">
+                                        <div>
+                                            <h4 class="staff-role-title">${emp.role}</h4>
+                                            <div class="staff-meta">Contratado: Sem. ${emp.hiredWeek || '?'}</div>
+                                        </div>
+                                        <button onclick="fireEmployee(${i})" class="btn-fire-sm">Despedir</button>
                                     </div>
-                                    <div style="text-align:right">
-                                        <div style="margin-bottom:5px;">
-                                            <label style="font-size:0.75rem; color:#94a3b8; display:block; margin-bottom:2px;">Salario</label>
-                                            <div style="display:flex; align-items:center; gap:5px; justify-content:flex-end;">
+                                    
+                                    <div class="staff-stat-row">
+                                        <span style="width:60px;">Habilidad</span>
+                                        <div class="staff-bar-track">
+                                            <div class="staff-bar-fill bar-skill" style="width:${(emp.skill * 100).toFixed(0)}%"></div>
+                                        </div>
+                                        <span>${(emp.skill * 100).toFixed(0)}%</span>
+                                    </div>
+                                    <div class="staff-stat-row">
+                                        <span style="width:60px;">Moral</span>
+                                        <div class="staff-bar-track">
+                                            <div class="staff-bar-fill bar-morale ${emp.morale < 0.4 ? 'low' : ''}" style="width:${(emp.morale * 100).toFixed(0)}%"></div>
+                                        </div>
+                                        <span>${(emp.morale * 100).toFixed(0)}%</span>
+                                    </div>
+
+                                    <div class="staff-controls">
+                                        <div class="salary-control">
+                                            <span style="font-size:0.8rem; color:#94a3b8;">Salario</span>
+                                            <div class="salary-input-wrapper">
                                                 <input 
                                                     type="number" 
                                                     id="salary-input-${i}" 
@@ -5614,21 +5640,22 @@ var UI = {
                                                     min="1000" 
                                                     max="9000" 
                                                     step="100"
-                                                    style="width:80px; padding:4px 6px; background:#0f172a; border:1px solid #475569; color:white; border-radius:4px; font-size:0.85rem; text-align:right;"
+                                                    class="comp-input-sm"
                                                     onchange="updateEmployeeSalary(${i})"
                                                 >
                                                 <button 
                                                     onclick="updateEmployeeSalary(${i})" 
-                                                    style="background:var(--accent-color); color:#0f172a; border:none; border-radius:4px; padding:4px 8px; cursor:pointer; font-size:0.7rem; font-weight:600;"
+                                                    class="btn-icon-check"
                                                     title="Actualizar salario"
                                                 >✓</button>
                                             </div>
                                         </div>
-                                        <div style="font-size:0.7rem; color:#94a3b8; margin-bottom:3px;">Req. Mín: ${formatCurrency(emp.requiredWage)}</div>
-                                        <label style="font-size:0.7rem;"><input type="checkbox" ${emp.autoWage ? 'checked' : ''} onchange="toggleAutoWage(${i})"> Auto-subida</label>
-                                    </div>
-                                    <div style="text-align:right">
-                                         <button onclick="fireEmployee(${i})" style="color:var(--danger-color); background:none; border:1px solid var(--danger-color); border-radius:4px; padding:2px 5px; cursor:pointer">Despedir</button>
+                                        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:5px;">
+                                            <span style="font-size:0.7rem; color:#64748b;">Mín: ${formatCurrency(emp.requiredWage)}</span>
+                                            <label style="font-size:0.7rem; color:#cbd5e1; cursor:pointer;">
+                                                <input type="checkbox" ${emp.autoWage ? 'checked' : ''} onchange="toggleAutoWage(${i})"> Auto-subida
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
                             `;
@@ -5636,21 +5663,28 @@ var UI = {
 
 
                     tabContent.innerHTML = `
-                            <div class="staff-section">
-                                <div class="staff-header">
-                                    <h3>Plantilla (${co.staff.length} / ${co.maxStaff})</h3>
+                            <div class="comp-dash-container">
+                                <div class="staff-header" style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #334155; padding-bottom:15px;">
+                                    <h3 style="margin:0;">Plantilla (${co.staff.length} / ${co.maxStaff})</h3>
                                     <button id="btn-upgrade-office" class="btn-sm" ${upgradeDisabled}>${upgradeText}</button>
                                 </div>
-                                <div class="staff-list">
-                                    ${staffHtml || '<p>No hay empleados.</p>'}
+                                <div class="staff-grid">
+                                    ${staffHtml || '<div style="grid-column:1/-1; text-align:center; padding:40px; color:#64748b;">No hay empleados contratados.</div>'}
                                 </div>
                                 <div class="hire-panel">
-                                    <h4>Contratar</h4>
-                                    <div style="display:flex; gap:5px;">
-                                        <button onclick="hireRole('Dependiente', 1200)" class="btn-hire">Dependiente (1.2k)</button>
-                                        <button onclick="hireRole('Experto', 1800)" class="btn-hire" ${expertBtnDisabled} style="${expertBtnStyle}" title="${expertLocked ? 'Requiere Nivel de Producto 5 (Actual: ' + co.productLevel + ')' : ''}">${expertBtnText}</button>
+                                    <h4 style="margin-top:0; color:#38bdf8;">Centro de Contratación</h4>
+                                    <div class="hire-grid">
+                                        <button onclick="hireRole('Dependiente', 1200)" class="btn-hire">
+                                            <div style="font-weight:700;">Dependiente</div>
+                                            <div style="font-size:0.8rem; opacity:0.8;">1.200€ / mes</div>
+                                        </button>
+                                        <button onclick="hireRole('Experto', 1800)" class="btn-hire" ${expertBtnDisabled} style="${expertBtnStyle}" title="${expertLocked ? 'Requiere Nivel de Producto 5 (Actual: ' + co.productLevel + ')' : ''}">
+                                            <div style="font-weight:700;">${expertLocked ? '🔒 Experto' : 'Experto'}</div>
+                                            <div style="font-size:0.8rem; opacity:0.8;">1.800€ / mes</div>
+                                            ${expertLocked ? '<div style="font-size:0.7rem; color:#f87171; margin-top:2px;">Req: Nv.5</div>' : ''}
+                                        </button>
                                     </div>
-                                    ${expertLocked ? '<p style="color:#fbbf24; font-size:0.75rem; margin-top:8px; text-align:center;">💡 Mejora el Nivel de Producto a 5 para desbloquear empleados Expertos (Actual: Nivel ' + co.productLevel + ')</p>' : ''}
+                                    ${expertLocked ? '<p style="color:#fbbf24; font-size:0.75rem; margin-top:15px;">💡 Mejora tu Producto a Nivel 5 para atraer talento experto.</p>' : ''}
                                 </div>
                             </div>
                         `;
@@ -5859,41 +5893,49 @@ var UI = {
                     }
 
                     tabContent.innerHTML = `
-                            <div class="strategy-section">
-                                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; margin-bottom:25px;">
-                                    <div class="card" style="padding:15px; border:1px solid #334155;">
-                                        <h4>🏷️ Estrategia de Precio</h4>
+                            <div class="comp-dash-container">
+                                <div class="strategy-grid">
+                                    <div class="strat-card">
+                                        <h4 class="staff-role-title" style="margin-bottom:15px;">🏷️ Estrategia de Precio</h4>
                                         <p style="font-size:0.85rem; color:#94a3b8; margin-bottom:5px;">Base Mercado: ${formatCurrency(baseTicket)}</p>
-                                        <p style="font-size:0.85rem; color:#facc15; margin-bottom:10px;">Equilibrio (Rep. ${co.reputation.toFixed(1)}): <strong>${formatCurrency(equiPrice)}</strong></p>
+                                        <p style="font-size:0.85rem; color:#facc15; margin-bottom:15px;">Equilibrio (Rep. ${co.reputation.toFixed(1)}): <strong>${formatCurrency(equiPrice)}</strong></p>
                                         <div style="display:flex; align-items:center; gap:10px;">
-                                            <input type="number" id="price-input" value="${currentPrice}" step="0.5" style="padding:5px; border-radius:4px; border:1px solid #475569; background:#0f172a; color:white; width:80px;">
-                                            <button onclick="updatePrice()" class="btn-sm" style="background:var(--accent-color); color:black;">Fijar</button>
+                                            <input type="number" id="price-input" value="${currentPrice}" step="0.5" class="comp-input-sm" style="width:100px; text-align:center;">
+                                            <button onclick="updatePrice()" class="btn-sm" style="background:#38bdf8; color:#0f172a; border:none; padding:6px 15px;">Fijar</button>
                                         </div>
                                     </div>
-                                    <div class="card" style="padding:15px; border:1px solid ${qColor}; background:rgba(15, 23, 42, 0.5);">
-                                        <h4>📊 Análisis de Reputación</h4>
-                                        <div style="font-size:0.8rem; margin-bottom:10px;">
-                                            <div style="display:flex; justify-content:space-between; border-bottom:1px solid #334155; padding-bottom:2px; margin-bottom:5px;">
-                                                <span>Calidad Real:</span>
-                                                <strong>${(stats.actualQuality * 100).toFixed(0)}%</strong>
+                                    <div class="strat-card highlight">
+                                        <h4 class="staff-role-title">📊 Análisis de Reputación</h4>
+                                        <div class="analysis-box">
+                                            <div class="data-row strong">
+                                                <span>Calidad Real</span>
+                                                <span>${(stats.actualQuality * 100).toFixed(0)}%</span>
                                             </div>
-                                            <div style="color:#94a3b8; margin-bottom:5px; padding-left:10px;">
-                                                • Base Proveedor: ${(curProv.quality * 100).toFixed(0)}%<br>
-                                                • Bonus I+D (Nvl ${co.productLevel}): +${((co.productLevel - 1) * 5).toFixed(0)}%
+                                            <div class="data-row">
+                                                <span>• Base Proveedor</span>
+                                                <span>${(curProv.quality * 100).toFixed(0)}%</span>
+                                            </div>
+                                            <div class="data-row" style="margin-bottom:15px;">
+                                                <span>• Bonus I+D (Nvl ${co.productLevel})</span>
+                                                <span style="color:#4ade80;">+${((co.productLevel - 1) * 5).toFixed(0)}%</span>
                                             </div>
 
-                                            <div style="display:flex; justify-content:space-between; border-bottom:1px solid #334155; padding-bottom:2px; margin-bottom:5px;">
-                                                <span>Exingencia (Precio):</span>
-                                                <strong>${(stats.requiredQuality * 100).toFixed(0)}%</strong>
+                                            <div class="data-row strong">
+                                                <span>Exigencia (Precio)</span>
+                                                <span>${(stats.requiredQuality * 100).toFixed(0)}%</span>
                                             </div>
-                                            <div style="color:#94a3b8; margin-bottom:5px; padding-left:10px;">
-                                                • Base Mercado: 70%<br>
-                                                • Ajuste Precio: ${((stats.requiredQuality - 0.70) * 100).toFixed(0)}%
+                                            <div class="data-row">
+                                                <span>• Base Mercado</span>
+                                                <span>70%</span>
+                                            </div>
+                                            <div class="data-row">
+                                                <span>• Ajuste Precio</span>
+                                                <span>${((stats.requiredQuality - 0.70) * 100).toFixed(0)}%</span>
                                             </div>
                                         </div>
-                                        <div style="text-align:center; padding-top:5px; border-top:1px solid #334155;">
-                                            <p style="margin-bottom:0px;">Objetivo Reputación: <strong>${stats.targetRep ? stats.targetRep.toFixed(2) : '3.50'}</strong></p>
-                                            <p style="color:${qColor}; font-weight:bold; font-size:0.9rem; margin-top:2px;">${qText}</p>
+                                        <div style="text-align:center; padding-top:15px;">
+                                            <p style="margin-bottom:5px;">Objetivo Reputación: <strong>${stats.targetRep ? stats.targetRep.toFixed(2) : '3.50'}</strong></p>
+                                            <p style="color:${qColor}; font-weight:700; font-size:0.95rem;">${qText}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -5904,9 +5946,11 @@ var UI = {
                                 <h3 style="border-bottom:1px solid #334155; padding-bottom:5px; margin-bottom:15px;">🚀 Desarrollo de Producto</h3>
                                 <div class="invest-grid">
                                     <div class="invest-card">
-                                        <h4>Producto (Nivel ${co.productLevel})</h4>
-                                        <p>Mejora calidad (+5%) y satisfacción.</p>
-                                        <button onclick="investCo('product_dev')">Invertir (${formatCurrency(co.productLevel * 5000)})</button>
+                                        <div>
+                                            <h4 class="staff-role-title">Producto (Nivel ${co.productLevel})</h4>
+                                            <p style="color:#94a3b8; font-size:0.9rem; margin-top:5px;">Mejora la calidad base (+5%) y aumenta la satisfacción del cliente.</p>
+                                        </div>
+                                        <button onclick="investCo('product_dev')" class="btn-action-primary" style="width:100%; margin-top:10px;">Invertir (${formatCurrency(co.productLevel * 5000)})</button>
                                     </div>
                                 </div>
                             </div>
@@ -5927,21 +5971,21 @@ var UI = {
                     }
 
                     const strategyHTML = `
-                                <div class="strategy-section">
+                                <div class="comp-dash-container">
                                     <h3 style="border-bottom:1px solid #334155; padding-bottom:5px; margin-bottom:15px;">📡 Canales de Publicidad</h3>
                                     <div class="options-grid" style="margin-bottom:20px;">${mktOpts}</div>
 
-                                    <div style="background:#1e293b; padding:15px; border-radius:8px; font-size:0.9rem; margin-bottom:20px; border:1px dashed #334155;">
-                                        <h4 style="margin-top:0; color:#38bdf8;">📈 Análisis de Demanda</h4>
-                                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                                            <div>Base: <strong>${comp.base}</strong></div>
-                                            <div>Tráfico: <strong>x${comp.traffic.toFixed(2)}</strong></div>
-                                            <div>Marketing: <strong>x${comp.marketing.toFixed(2)}</strong></div>
-                                            <div>Reputación: <strong>x${comp.reputation.toFixed(2)}</strong></div>
-                                            <div>Orgánico: <strong>x${comp.organic.toFixed(2)}</strong></div>
-                                            <div style="color:#facc15;">Volatilidad (Azar): <strong>x${(comp.volatility || 1).toFixed(2)}</strong></div>
-                                            <div style="grid-column: 1 / -1; border-top:1px solid #334155; margin-top:5px; padding-top:5px;">
-                                                Total Estimado: <strong style="color:var(--success-color);">${stats.demand || 0} clientes/mes</strong>
+                                    <div class="strat-card highlight" style="margin-bottom:25px;">
+                                        <h4 class="staff-role-title" style="color:#38bdf8;">📈 Análisis de Demanda</h4>
+                                        <div class="analysis-box" style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                                            <div class="data-row"><span>Base:</span> <strong>${comp.base}</strong></div>
+                                            <div class="data-row"><span>Tráfico:</span> <strong>x${comp.traffic.toFixed(2)}</strong></div>
+                                            <div class="data-row"><span>Marketing:</span> <strong>x${comp.marketing.toFixed(2)}</strong></div>
+                                            <div class="data-row"><span>Reputación:</span> <strong>x${comp.reputation.toFixed(2)}</strong></div>
+                                            <div class="data-row"><span>Orgánico:</span> <strong>x${comp.organic.toFixed(2)}</strong></div>
+                                            <div class="data-row" style="color:#facc15;"><span>Volatilidad:</span> <strong>x${(comp.volatility || 1).toFixed(2)}</strong></div>
+                                            <div style="grid-column: 1 / -1; border-top:1px solid #334155; margin-top:5px; padding-top:10px; text-align:center;">
+                                                Total Estimado: <strong style="color:#4ade80; font-size:1.1rem;">${stats.demand || 0} clientes/mes</strong>
                                             </div>
                                         </div>
                                     </div>
@@ -5949,49 +5993,63 @@ var UI = {
                                     <h3 style="border-bottom:1px solid #334155; padding-bottom:5px; margin-bottom:15px;">🚀 Infraestructura de Marketing</h3>
                                     <div class="invest-grid">
                                         <div class="invest-card">
-                                            <h4>Marketing (Nivel ${co.marketingLevel})</h4>
-                                            <p>Potencia eficacia (+20%) de campañas.</p>
-                                            <button onclick="investCo('marketing_infra')">Invertir (${formatCurrency(co.marketingLevel * 5000)})</button>
+                                            <div>
+                                                <h4 class="staff-role-title">Marketing (Nivel ${co.marketingLevel})</h4>
+                                                <p style="color:#94a3b8; font-size:0.9rem; margin-top:5px;">Potencia la eficacia (+20%) de todas las campañas activas.</p>
+                                            </div>
+                                            <button onclick="investCo('marketing_infra')" class="btn-action-primary" style="width:100%; margin-top:10px;">Invertir (${formatCurrency(co.marketingLevel * 5000)})</button>
                                         </div>
                                     </div>
                                 </div>
                             `;
                     tabContent.innerHTML = strategyHTML;
 
+
                     // Functions moved to shared scope above
 
 
                 } else if (activeTab === 'finance') {
                     tabContent.innerHTML = `
-                                <div class="finance-actions">
-                                 <h3>Movimientos de Caja</h3>
-                                 <div class="control-group">
-                                     <label>Retirar Fondos a Cuenta Personal</label>
-                                     <div style="display:flex; gap:10px;">
-                                         <input type="number" id="co-trans-amount" placeholder="Cantidad" style="width:150px;">
-                                         <button id="btn-withdraw">Retirar</button>
-                                     </div>
-                                 </div>
-                                 <div class="control-group">
-                                     <label>Inyectar Capital Personal</label>
-                                     <div style="display:flex; gap:10px;">
-                                         <input type="number" id="co-dep-amount" placeholder="Cantidad" style="width:150px;">
-                                         <button id="btn-deposit">Ingresar</button>
-                                     </div>
-                                 </div>
+                                <div class="comp-dash-container">
+                                    <div class="fin-panel">
+                                        <div class="fin-section">
+                                            <h3 class="staff-role-title">💰 Movimientos de Caja</h3>
+                                            <div class="fin-control-group">
+                                                <div style="flex:1;">
+                                                    <label style="display:block; margin-bottom:5px; color:#cbd5e1; font-size:0.9rem;">Retirar Fondos (a cuenta personal)</label>
+                                                    <div style="display:flex; gap:10px;">
+                                                        <input type="number" id="co-trans-amount" placeholder="Cantidad" class="comp-input-lg">
+                                                        <button id="btn-withdraw" class="btn-action-primary">Retirar</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="fin-control-group">
+                                                 <div style="flex:1;">
+                                                    <label style="display:block; margin-bottom:5px; color:#cbd5e1; font-size:0.9rem;">Inyectar Capital (desde cuenta personal)</label>
+                                                    <div style="display:flex; gap:10px;">
+                                                        <input type="number" id="co-dep-amount" placeholder="Cantidad" class="comp-input-lg">
+                                                        <button id="btn-deposit" class="btn-action-primary">Ingresar</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
 
-                                 <h3 style="margin-top:20px;">Salario del CEO</h3>
-                                 <div class="control-group">
-                                     <p>Tu sueldo mensual (Cubre tus gastos personales)</p>
-                                     <div style="display:flex; gap:10px;">
-                                         <input type="number" id="co-ceo-salary" value="${co.ceoSalary || 0}" style="width:150px;">
-                                         <button id="btn-set-salary">Actualizar</button>
-                                     </div>
-                                 </div>
+                                        <div class="fin-section">
+                                            <h3 class="staff-role-title">💼 Salario del CEO</h3>
+                                            <p style="color:#94a3b8; font-size:0.9rem; margin-bottom:10px;">Tu sueldo mensual (Cubre tus gastos personales)</p>
+                                            <div style="display:flex; gap:10px;">
+                                                <input type="number" id="co-ceo-salary" value="${co.ceoSalary || 0}" class="comp-input-lg" style="max-width:200px;">
+                                                <button id="btn-set-salary" class="btn-action-primary">Actualizar</button>
+                                            </div>
+                                        </div>
 
-                                 <h3 style="margin-top:20px; color:var(--danger-color)">Zona de Peligro</h3>
-                                 <button onclick="sellCompanyAction()" style="background:var(--danger-color); color:white; border:none; padding:10px; width:100%;">VENDER EMPRESA (EXIT)</button>
-                             </div>
+                                        <div class="fin-section" style="border-bottom:none; margin-bottom:0;">
+                                            <h3 class="staff-role-title" style="color:#ef4444;">⚠️ Zona de Peligro</h3>
+                                            <p style="color:#94a3b8; font-size:0.9rem; margin-bottom:15px;">Esta acción es irreversible.</p>
+                                            <button onclick="sellCompanyAction()" class="btn-action-danger">VENDER EMPRESA (EXIT)</button>
+                                        </div>
+                                    </div>
+                                </div>
             `;
 
                     document.getElementById('btn-withdraw').onclick = () => {

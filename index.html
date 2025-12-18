@@ -32,172 +32,122 @@
 
     <!-- Company Creation Wizard Modal -->
     <!-- PREMIUM Company Creation Wizard (Marketing Expert Edition) -->
-    <div id="company-wizard-modal" class="modal">
-        <div class="modal-content"
-            style="max-width: 950px; padding: 0; overflow: hidden; display: flex; flex-direction: column; background: linear-gradient(180deg, #0f172a, #0a0f1a); border: 1px solid rgba(251, 191, 36, 0.3); border-radius: 24px; box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5), 0 0 40px rgba(251, 191, 36, 0.1);">
+    <!-- PREMIUM Company Creation Wizard (Marketing Expert Edition) -->
+    <div id="company-wizard-modal" class="modal wizard-mode">
+        <div class="wizard-content">
 
-            <!-- Header - Premium Design -->
-            <div
-                style="background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(245, 158, 11, 0.05)); padding: 25px 30px; border-bottom: 1px solid rgba(251, 191, 36, 0.2); display: flex; justify-content: space-between; align-items: center; position: relative;">
-                <div
-                    style="position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #fbbf24, #f59e0b, #fbbf24);">
-                </div>
-                <div style="display: flex; align-items: center; gap: 15px;">
-                    <div style="font-size: 2.5rem; filter: drop-shadow(0 0 15px rgba(251, 191, 36, 0.5));">🚀</div>
+            <!-- Header -->
+            <div class="wizard-header">
+                <div class="wizard-title-group">
+                    <div class="wizard-icon">🚀</div>
                     <div>
-                        <h2 style="margin: 0; font-size: 1.4rem; color: #fbbf24; font-weight: 800;">Lanzamiento de
-                            Venture</h2>
-                        <p style="margin: 5px 0 0; color: #94a3b8; font-size: 0.85rem;">Diseña tu modelo de negocio y
-                            estrategia de mercado</p>
+                        <h2 class="wizard-title">Lanzamiento de Venture</h2>
+                        <p class="wizard-subtitle">Diseña tu modelo de negocio y estrategia de mercado</p>
                     </div>
                 </div>
-                <span class="close" id="close-wizard"
-                    style="position: static; color: #64748b; font-size: 2rem; cursor: pointer; transition: color 0.2s;">&times;</span>
+                <span class="close wizard-close" id="close-wizard">&times;</span>
             </div>
 
-            <div style="display: flex; flex: 1; min-height: 500px;">
+            <div class="wizard-body">
                 <!-- Main Content Area -->
-                <div style="flex: 2; padding: 30px; overflow-y: auto;">
+                <div class="wizard-main">
 
-                    <!-- Progress Tracker - Premium -->
-                    <div class="wizard-progress-new"
-                        style="display: flex; gap: 15px; margin-bottom: 30px; padding: 15px; background: rgba(30, 41, 59, 0.5); border-radius: 12px;">
-                        <div style="flex: 1; display: flex; align-items: center; gap: 10px;">
-                            <div
-                                style="width: 28px; height: 28px; background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; color: #0f172a;">
-                                1</div>
-                            <span style="color: #fbbf24; font-size: 0.85rem; font-weight: 600;">Modelo</span>
-                            <div id="wiz-step-ind-1" class="step-indicator active"
-                                style="flex: 1; height: 4px; background: #334155; border-radius: 2px; overflow: hidden;">
-                                <div
-                                    style="width: 100%; height: 100%; background: linear-gradient(90deg, #fbbf24, #f59e0b);">
-                                </div>
+                    <!-- Progress Tracker -->
+                    <div class="wizard-progress">
+                        <div class="progress-step">
+                            <div class="step-badge active">1</div>
+                            <span class="step-label active">Modelo</span>
+                            <div class="step-line-container">
+                                <div id="wiz-step-ind-1" class="step-line-fill full"></div>
                             </div>
                         </div>
-                        <div style="flex: 1; display: flex; align-items: center; gap: 10px;">
-                            <div id="wiz-step-dot-2" class="step-indicator"
-                                style="width: 28px; height: 28px; background: #334155; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; color: #64748b; transition: all 0.3s;">
-                                2</div>
-                            <span id="wiz-step-label-2"
-                                style="color: #64748b; font-size: 0.85rem; font-weight: 600;">Ubicación</span>
-                            <div id="wiz-step-ind-2"
-                                style="flex: 1; height: 4px; background: #334155; border-radius: 2px; overflow: hidden;">
-                                <div id="wiz-step-bar-2"
-                                    style="width: 0%; height: 100%; background: linear-gradient(90deg, #fbbf24, #f59e0b); transition: width 0.3s;">
-                                </div>
+                        <div class="progress-step">
+                            <div id="wiz-step-dot-2" class="step-badge inactive">2</div>
+                            <span id="wiz-step-label-2" class="step-label inactive">Ubicación</span>
+                            <div id="wiz-step-ind-2" class="step-line-container">
+                                <div id="wiz-step-bar-2" class="step-line-fill"></div>
                             </div>
                         </div>
-
                     </div>
 
                     <!-- STEP 1: MODEL & CONCEPT -->
                     <div id="wizard-step-1" class="wizard-step active">
-                        <h3
-                            style="color: #fbbf24; margin-bottom: 20px; font-size: 1.2rem; display: flex; align-items: center; gap: 10px;">
+                        <h3 class="step-header">
                             <span style="font-size: 1.5rem;">📋</span> Define tu Modelo de Negocio
                         </h3>
 
-                        <div class="form-group" style="margin-bottom: 25px;">
-                            <label
-                                style="display: block; color: #cbd5e1; margin-bottom: 10px; font-weight: 600; font-size: 0.9rem;">🏷️
-                                Nombre Comercial</label>
-                            <input type="text" id="wiz-name" placeholder="Ej. Nexus Innovations, Café Altura..."
-                                style="width: 100%; background: linear-gradient(145deg, #1e293b, #0f172a); border: 1px solid #475569; padding: 14px 16px; color: white; border-radius: 12px; font-size: 1rem; outline: none; transition: all 0.2s;">
+                        <div class="wiz-form-group">
+                            <label class="wiz-label">🏷️ Nombre Comercial</label>
+                            <input type="text" id="wiz-name" class="wiz-input"
+                                placeholder="Ej. Nexus Innovations, Café Altura...">
                         </div>
 
                         <p
                             style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
                             <span style="font-size: 1.2rem;">🎯</span> Selecciona tu vehículo de inversión:
                         </p>
-                        <div id="wiz-types-grid" class="wiz-cards-grid"
-                            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                        <div id="wiz-types-grid" class="wiz-cards-grid">
                             <!-- Injected JS -->
                         </div>
                     </div>
 
                     <!-- STEP 2: LOCATION STRATEGY -->
-                    <div id="wizard-step-2" class="wizard-step">
-                        <h3
-                            style="color: #fbbf24; margin-bottom: 20px; font-size: 1.2rem; display: flex; align-items: center; gap: 10px;">
+                    <div id="wizard-step-2" class="wizard-step" style="display:none;">
+                        <h3 class="step-header">
                             <span style="font-size: 1.5rem;">📍</span> Estrategia de Ubicación (HQ)
                         </h3>
                         <p style="color: #94a3b8; margin-bottom: 20px; font-size: 0.9rem;">Elige donde establecer tu
                             sede. El tráfico determina tu techo de ingresos inicial.</p>
 
-                        <div id="wiz-loc-grid" class="wiz-cards-grid loc-grid"
-                            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px;">
+                        <div id="wiz-loc-grid" class="wiz-cards-grid loc-grid">
                             <!-- Injected JS -->
                         </div>
                     </div>
 
-                    <!-- MOBILE NAVIGATION BUTTONS - Only visible on mobile -->
-                    <div id="mobile-wiz-buttons" style="display: none; margin-top: 20px; gap: 10px;">
-                        <button id="btn-wiz-back-mobile"
-                            style="flex: 1; padding: 16px; background: transparent; border: 1px solid #475569; color: #94a3b8; border-radius: 10px; cursor: pointer; font-size: 1rem; font-weight: bold; min-height: 54px;">
-                            ← Atrás
-                        </button>
-                        <button id="btn-wiz-next-mobile" class="btn-primary"
-                            style="flex: 2; padding: 16px; background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #0f172a; font-weight: 800; border-radius: 10px; border: none; cursor: pointer; font-size: 1rem; min-height: 54px;">
-                            Siguiente ➡️
-                        </button>
+                    <!-- MOBILE NAVIGATION BUTTONS -->
+                    <div id="mobile-wiz-buttons" class="mobile-wiz-buttons"
+                        style="display: none; margin-top: 20px; gap: 10px;">
+                        <button id="btn-wiz-back-mobile" class="btn-wiz-back">← Atrás</button>
+                        <button id="btn-wiz-next-mobile" class="btn-wiz-next">Siguiente ➡️</button>
                     </div>
 
                 </div>
 
-                <!-- Sidebar: Investment Summary - Premium -->
-                <div
-                    style="flex: 1; background: linear-gradient(180deg, #1e293b, #0f172a); border-left: 1px solid rgba(251, 191, 36, 0.2); padding: 30px; display: flex; flex-direction: column;">
-                    <h4
-                        style="color: #fbbf24; margin-top: 0; margin-bottom: 25px; font-size: 1rem; text-transform: uppercase; letter-spacing: 1.5px; display: flex; align-items: center; gap: 8px;">
+                <!-- Sidebar: Investment Summary -->
+                <div class="wizard-sidebar">
+                    <h4 class="sidebar-title">
                         <span style="font-size: 1.2rem;">💰</span> Resumen de Capital
                     </h4>
 
-                    <div class="summary-item"
-                        style="margin-bottom: 25px; padding: 15px; background: linear-gradient(145deg, rgba(74, 222, 128, 0.1), transparent); border-radius: 12px; border: 1px solid rgba(74, 222, 128, 0.2);">
-                        <span
-                            style="display: block; color: #94a3b8; font-size: 0.8rem; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px;">Capital
-                            Disponible</span>
-                        <strong id="wiz-current-cash" style="font-size: 1.5rem; color: #4ade80; font-weight: 800;">0
-                            €</strong>
+                    <div class="cash-display-card">
+                        <span class="cash-label">Capital Disponible</span>
+                        <strong id="wiz-current-cash" class="cash-value">0 €</strong>
                     </div>
 
                     <div style="flex: 1;">
-                        <div class="cost-breakdown"
-                            style="background: linear-gradient(145deg, #0f172a, #1e293b); padding: 20px; border-radius: 12px; border: 1px solid #334155;">
-                            <div
-                                style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 0.9rem;">
-                                <span style="color: #94a3b8; display: flex; align-items: center; gap: 6px;">🏢
-                                    Setup</span>
-                                <span id="summ-setup-cost" style="color: #f8fafc; font-weight: 600;">0 €</span>
+                        <div class="cost-breakdown-card">
+                            <div class="cost-row">
+                                <span>🏢 Setup</span>
+                                <span id="summ-setup-cost">0 €</span>
                             </div>
-                            <div
-                                style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 0.9rem;">
-                                <span style="color: #94a3b8; display: flex; align-items: center; gap: 6px;">🏠 Alquiler
-                                    (Mes 1)</span>
-                                <span id="summ-rent-cost" style="color: #f8fafc; font-weight: 600;">0 €</span>
+                            <div class="cost-row">
+                                <span>🏠 Alquiler (Mes 1)</span>
+                                <span id="summ-rent-cost">0 €</span>
                             </div>
-                            <div
-                                style="height: 1px; background: linear-gradient(90deg, transparent, #475569, transparent); margin: 15px 0;">
-                            </div>
-                            <div
-                                style="display: flex; justify-content: space-between; font-weight: bold; font-size: 1.1rem;">
-                                <span style="color: #f87171;">💸 Total Inversión</span>
-                                <span id="wiz-total-cost" style="color: #f87171; font-weight: 800;">0 €</span>
+                            <div class="cost-divider"></div>
+                            <div class="total-row">
+                                <span>💸 Total Inversión</span>
+                                <span id="wiz-total-cost">0 €</span>
                             </div>
                         </div>
-                        <div id="wiz-error-msg"
-                            style="margin-top: 15px; padding: 12px; background: rgba(248, 113, 113, 0.1); border-radius: 8px; border: 1px solid rgba(248, 113, 113, 0.3); color: #f87171; font-size: 0.85rem; display: none;">
+                        <div id="wiz-error-msg" class="wiz-error-box">
                             ⚠️ Capital insuficiente para esta operación.
                         </div>
                     </div>
 
-                    <div style="display: flex; gap: 10px; margin-top: 25px;">
-                        <button id="btn-wiz-back"
-                            style="flex: 1; padding: 14px; background: transparent; border: 1px solid #475569; color: #94a3b8; border-radius: 10px; cursor: pointer; font-weight: 600; display: none; transition: all 0.2s;">←
-                            Atrás</button>
-                        <button id="btn-wiz-next" class="btn-primary"
-                            style="flex: 2; padding: 14px; background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #0f172a; font-weight: 800; border-radius: 10px; border: none; cursor: pointer; box-shadow: 0 4px 0 #b45309; transition: all 0.15s;">Siguiente
-                            ➡️</button>
+                    <div class="wiz-actions">
+                        <button id="btn-wiz-back" class="btn-wiz-back">← Atrás</button>
+                        <button id="btn-wiz-next" class="btn-wiz-next">Siguiente ➡️</button>
                     </div>
                 </div>
             </div>
