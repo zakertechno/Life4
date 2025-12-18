@@ -37,7 +37,15 @@
             /* Prevent text selection like an app */
             touch-action: pan-x pan-y;
             /* Disable double-tap zoom */
+            /* Disable double-tap zoom */
             min-height: 100vh;
+            background-color: #0f172a;
+            /* Fallback for overscroll */
+        }
+
+        html {
+            background-color: #0f172a;
+            /* iOS Overscroll Fix */
         }
 
         /* JUICY BUTTONS MICRO-INTERACTIONS */
@@ -4188,7 +4196,8 @@
 
         /* Header */
         .wizard-header {
-            background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(245, 158, 11, 0.05));
+            background: rgba(15, 23, 42, 0.95);
+            /* Neutral dark, slight transparency */
             padding: 25px 30px;
             border-bottom: 1px solid rgba(251, 191, 36, 0.2);
             display: flex;
