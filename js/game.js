@@ -1,4 +1,3 @@
-console.log("CRITICAL DEBUG: SCRIPT STARTED");
 /*******************************************************
  * ENDGAME SYSTEM (YEAR 50)
  *******************************************************/
@@ -4333,7 +4332,30 @@ var UI = {
                 card.style.borderColor = '#475569';
             }
 
+            // Course icon based on type/category
+            const getCourseIcon = (courseId) => {
+                const icons = {
+                    'bachillerato': '🎒',
+                    'fp_medio': '🔧',
+                    'fp_admin': '📊',
+                    'fp_dam': '💻',
+                    'fp_maint': '🔩',
+                    'grado_ade': '🏛️',
+                    'grado_cs': '🖥️',
+                    'grado_civil': '🏗️',
+                    'master_fin': '💹',
+                    'master_ai': '🤖',
+                    'master_ing': '⚙️',
+                    'bootcamp': '🚀'
+                };
+                return icons[courseId] || '📚';
+            };
+
+
+            const courseIcon = getCourseIcon(course.id);
+
             card.innerHTML = `
+                        <div class="course-icon">${courseIcon}</div>
                         <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
                             <h4 style="margin:0; ${isLocked ? 'color:#cbd5e1' : 'color:#facc15'}">${course.name}</h4>
                             ${statusBadge}
@@ -4347,6 +4369,7 @@ var UI = {
                         </div>
                         ${actionBtn}
                     `;
+
 
             const btn = card.querySelector('.btn-course-start');
             if (btn) {
@@ -4897,7 +4920,38 @@ var UI = {
 
                     const pathName = UI.getLabel(vac.path);
 
+                    // Job icon based on career path
+                    const getJobIcon = (path) => {
+                        const icons = {
+                            'unskilled': '🛒',
+                            'tres_deporte': '👟',
+                            'admin_contable': '📋',
+                            'gestor_cobros': '💳',
+                            'admin_inmo': '🏘️',
+                            'prog_apps': '💻',
+                            'sys_support': '🖥️',
+                            'mobile_dev': '📱',
+                            'maint_ind': '🔧',
+                            'clima': '❄️',
+                            'buildings': '🏢',
+                            'analyst_fin': '📊',
+                            'pm_marketing': '📣',
+                            'consultant': '💼',
+                            'data_science': '🧠',
+                            'software_eng': '⌨️',
+                            'devops': '🚀',
+                            'civil_eng': '🏗️',
+                            'site_works': '🦺',
+                            'project_mgmt': '📐',
+                            'temporary': '⏰'
+                        };
+                        return icons[path] || '💼';
+                    };
+
+                    const jobIcon = getJobIcon(vac.path);
+
                     card.innerHTML = `
+                            <div class="job-icon">${jobIcon}</div>
                             <div class="market-card-top">
                                 <h4>${vac.title}</h4>
                                 <span class="market-path">${pathName}</span>
@@ -4905,13 +4959,14 @@ var UI = {
                             <div class="market-tags">
                                 <span class="tag">Nivel Inicial</span>
                                 ${vac.type === 'gig' ? `<span class="tag" style="background:rgba(234, 179, 8, 0.2); color:#facc15; border:1px solid #facc15;">⏱ ${vac.duration} meses</span>` : ''}
-                                ${eduText ? `<span class="tag tag-edu" style="background:transparent; border:1px solid #94a3b8; color:#cbd5e1;">${eduText}</span>` : ''}
+                                ${eduText ? `<span class="tag tag-edu">${eduText}</span>` : ''}
                             </div>
                             <div class="market-footer">
                                 <div class="market-salary">${formatCurrency(vac.salary)}</div>
                                 <button class="btn-apply-small">Aplicar</button>
                             </div>
                         `;
+
 
                     card.querySelector('.btn-apply-small').onclick = () => {
                         const res = JobSys.applyToJob(vac.title);
