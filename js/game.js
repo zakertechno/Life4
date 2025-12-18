@@ -2925,24 +2925,24 @@ var UI = {
                                 <button class="btn-seg" data-tf="999" onclick="UI.changeTimeframe(999)" style="flex:1; background:transparent; border:none; color:#94a3b8; padding:10px; border-radius:8px; font-weight: 600; font-size: 0.85rem;">Todo</button>
                             </div>
 
-                            <!-- User Portfolio Stats - Premium Cards -->
-                            <div class="portfolio-strip" style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:15px;">
-                                <div style="background: linear-gradient(145deg, rgba(56, 189, 248, 0.1), rgba(14, 165, 233, 0.05)); border: 1px solid rgba(56, 189, 248, 0.3); padding:15px; border-radius:12px; text-align:center;">
-                                    <div style="font-size: 1.5rem; margin-bottom: 5px;">🎫</div>
-                                    <span style="display:block; font-size:0.7rem; color:#94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">En Cartera</span>
-                                    <span style="font-size:1.3rem; color:#38bdf8; font-weight:800;">${owned}</span>
-                                </div>
-                                <div style="background: linear-gradient(145deg, rgba(250, 204, 21, 0.1), rgba(251, 191, 36, 0.05)); border: 1px solid rgba(250, 204, 21, 0.3); padding:15px; border-radius:12px; text-align:center;">
-                                    <div style="font-size: 1.5rem; margin-bottom: 5px;">💰</div>
-                                    <span style="display:block; font-size:0.7rem; color:#94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Valor Actual</span>
-                                    <span style="font-size:1.3rem; color:#facc15; font-weight:800;">${formatCurrency(owned * stock.price)}</span>
-                                </div>
-                            </div>
 
                         </div>
 
                         <!-- 3. FOOTER (Fixed Actions) - Premium Buttons -->
                         <div class="ops-footer" style="flex:0 0 auto; border-top:1px solid #334155; padding-top:15px; margin-top:10px;">
+                            
+                            <!-- Compact Portfolio Stats -->
+                            <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:0.85rem; color:#cbd5e1; background:rgba(15, 23, 42, 0.5); padding:8px 12px; border-radius:8px; border:1px solid #334155;">
+                                <div>
+                                    <span style="color:#94a3b8;">En Cartera:</span> 
+                                    <strong style="color:#38bdf8;">${owned}</strong>
+                                </div>
+                                <div>
+                                    <span style="color:#94a3b8;">Valor:</span> 
+                                    <strong style="color:#facc15;">${formatCurrency(owned * stock.price)}</strong>
+                                </div>
+                            </div>
+
                             <div style="margin-bottom:12px;">
                                 <input type="number" id="stock-action-qty" placeholder="Cantidad de Acciones" 
                                     style="width:100%; padding:14px; background: linear-gradient(145deg, #1e293b, #0f172a); border:1px solid #475569; border-radius:10px; color:white; font-size:1.1rem; text-align:center; font-weight: 600;">
