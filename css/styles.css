@@ -307,51 +307,105 @@
             margin-top: 15px;
         }
 
+        /* =====================================================
+           STOCK MARKET - Premium Card Design
+           ===================================================== */
         .stock-card {
-            background-color: var(--card-bg);
+            background: linear-gradient(145deg, #1e293b, #0f172a);
             border: 1px solid #334155;
-            border-radius: 8px;
-            padding: 15px;
+            border-radius: 14px;
+            padding: 16px;
             cursor: pointer;
-            transition: border-color 0.2s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stock-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #38bdf8, #0ea5e9);
+            opacity: 0;
+            transition: opacity 0.3s;
         }
 
         .stock-card:hover {
-            border-color: var(--accent-color);
+            transform: translateY(-4px);
+            border-color: rgba(56, 189, 248, 0.5);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 0 0 20px rgba(56, 189, 248, 0.1);
+        }
+
+        .stock-card:hover::before {
+            opacity: 1;
         }
 
         .stock-header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
         }
 
         .stock-symbol {
-            font-weight: 600;
-            color: var(--text-primary);
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #fff;
         }
 
         .stock-price {
-            color: var(--text-secondary);
+            color: #e2e8f0;
+            font-weight: 600;
         }
 
         .stock-name {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            margin-bottom: 10px;
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-bottom: 12px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .stock-trend {
-            font-weight: 600;
-            font-size: 1.1rem;
+            font-weight: 700;
+            font-size: 1.15rem;
         }
 
         .trend-up {
-            color: var(--success-color);
+            color: #4ade80;
+            text-shadow: 0 0 10px rgba(74, 222, 128, 0.3);
         }
 
         .trend-down {
-            color: var(--danger-color);
+            color: #f87171;
+            text-shadow: 0 0 10px rgba(248, 113, 113, 0.3);
+        }
+
+        /* Stock Chip (Compact Grid View) */
+        .stock-chip {
+            background: linear-gradient(145deg, #1e293b, #0f172a) !important;
+            border-radius: 12px !important;
+            padding: 12px !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stock-chip:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .stock-chip.rising {
+            border-left: 3px solid #4ade80 !important;
+        }
+
+        .stock-chip.falling {
+            border-left: 3px solid #ef4444 !important;
         }
 
         /* Tutorial Highlight */
@@ -2102,17 +2156,36 @@
         /* MOBILE FIXES */
         @media (max-width: 768px) {
 
-            /* Real Estate Stats Grid */
+            /* Real Estate Stats Grid - Mobile Layout */
             .re-stats-container {
                 display: grid !important;
                 grid-template-columns: 1fr 1fr !important;
                 gap: 10px !important;
-                flex-wrap: wrap !important;
             }
 
             .re-stat-card {
-                margin-bottom: 0 !important;
                 min-width: 0 !important;
+            }
+
+            /* First card (Patrimonio Neto) spans full width */
+            .re-stat-card:first-child {
+                grid-column: 1 / -1 !important;
+            }
+
+            /* Stock Market Stats Grid - Mobile Layout */
+            .market-hero-stats {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr !important;
+                gap: 10px !important;
+            }
+
+            .market-stat-card {
+                min-width: 0 !important;
+            }
+
+            /* First card (Valor Cartera) spans full width */
+            .market-stat-card:first-child {
+                grid-column: 1 / -1 !important;
             }
 
             /* Stock Detail Modal Sizing */
@@ -2435,29 +2508,41 @@
             filter: grayscale(0);
         }
 
-        /* Action Buttons */
+        /* Action Buttons - Premium Design */
         .btn-action-primary {
-            width: 100%;
-            padding: 12px;
-            background: #38bdf8;
-            color: #0f172a;
+            flex: 1;
+            padding: 12px 16px;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
             border: none;
-            border-radius: 6px;
-            font-weight: bold;
+            border-radius: 10px;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.2s;
-            margin-top: 15px;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .btn-action-primary:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(56, 189, 248, 0.3);
+            box-shadow: 0 5px 20px rgba(34, 197, 94, 0.4);
         }
 
         .btn-action-primary:disabled {
             background: #334155;
             color: #64748b;
             cursor: not-allowed;
+        }
+
+        /* Secondary buy button (cash) */
+        .btn-action-primary[data-mortgage="false"] {
+            background: linear-gradient(135deg, #475569, #334155) !important;
+            border: 1px solid #64748b !important;
+        }
+
+        .btn-action-primary[data-mortgage="false"]:hover:not(:disabled) {
+            box-shadow: 0 5px 15px rgba(100, 116, 139, 0.3);
         }
 
         /* Market Section */
@@ -2867,96 +2952,162 @@
             font-weight: bold;
         }
 
+        /* =====================================================
+           REAL ESTATE - Premium Card Design
+           ===================================================== */
         .property-card-expert {
-            background: #1e293b;
+            background: linear-gradient(145deg, #1e293b, #0f172a);
             border: 1px solid #334155;
-            border-radius: 8px;
+            border-radius: 16px;
             overflow: hidden;
-            transition: transform 0.2s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
             flex-direction: column;
+            position: relative;
+        }
+
+        .property-card-expert::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #22c55e, #16a34a);
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 10;
         }
 
         .property-card-expert:hover {
-            transform: translateY(-3px);
-            border-color: #38bdf8;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            transform: translateY(-6px);
+            border-color: rgba(34, 197, 94, 0.5);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4), 0 0 25px rgba(34, 197, 94, 0.1);
+        }
+
+        .property-card-expert:hover::before {
+            opacity: 1;
         }
 
         .prop-img {
-            height: 120px;
-            background: #0f172a;
+            height: 100px;
+            background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 3rem;
+            font-size: 3.5rem;
             position: relative;
+            filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.3));
+            transition: all 0.3s ease;
+        }
+
+        .property-card-expert:hover .prop-img {
+            font-size: 4rem;
         }
 
         .deal-badge {
             position: absolute;
             top: 10px;
             right: 10px;
-            padding: 4px 8px;
-            border-radius: 4px;
+            padding: 6px 12px;
+            border-radius: 20px;
             font-size: 0.7rem;
-            font-weight: bold;
+            font-weight: 700;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .good-deal {
-            background: #059669;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
             color: white;
+            box-shadow: 0 2px 10px rgba(34, 197, 94, 0.4);
         }
 
         .bad-deal {
-            background: #ef4444;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
             color: white;
+            box-shadow: 0 2px 10px rgba(239, 68, 68, 0.4);
         }
 
         .prop-content {
-            padding: 15px;
+            padding: 18px;
             flex: 1;
             display: flex;
             flex-direction: column;
         }
 
         .prop-price-large {
-            font-size: 1.3rem;
+            font-size: 1.4rem;
             color: #fff;
-            font-weight: bold;
+            font-weight: 800;
             margin: 5px 0;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
         }
 
         .prop-details-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 8px;
+            gap: 10px;
             font-size: 0.8rem;
             color: #94a3b8;
-            margin: 10px 0;
+            margin: 12px 0;
+            padding: 10px;
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 8px;
         }
 
         .prop-roi {
             color: #4ade80;
-            font-weight: bold;
+            font-weight: 700;
+            text-shadow: 0 0 8px rgba(74, 222, 128, 0.3);
         }
 
         .prop-financials {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 10px;
+            gap: 12px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #334155;
         }
 
         .prop-financials .label {
-            font-size: 0.75rem;
-            color: #94a3b8;
+            font-size: 0.7rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .prop-financials .value {
             font-size: 1rem;
-            font-weight: bold;
+            font-weight: 700;
+        }
+
+        /* Button styles for property */
+        .btn-buy-property {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            border: none;
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.2s;
+            margin-top: 15px;
+        }
+
+        .btn-buy-property:hover {
+            transform: scale(1.03);
+            box-shadow: 0 5px 20px rgba(34, 197, 94, 0.4);
+        }
+
+        .btn-buy-property:disabled {
+            background: #334155;
+            cursor: not-allowed;
+            opacity: 0.6;
         }
 
         /* MARKET TAB (Trading Terminal) */

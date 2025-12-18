@@ -2723,19 +2723,23 @@ var UI = {
                             <span style="color:#94a3b8; font-size:0.9rem;">IBEX 35</span>
                         </div>
 
-                        <!-- MARKET HERO (Vertical Layout for Mobile) -->
-                        <div class="market-hero" style="display:flex; flex-direction:column; gap:12px; background:#1e293b; border-radius:12px; padding:16px; margin-bottom:20px;">
-                            <div style="border-bottom:1px solid #334155; padding-bottom:12px;">
-                                <div style="font-size:0.75rem; color:#94a3b8; text-transform:uppercase; margin-bottom:4px;">Valor Cartera</div>
-                                <div style="font-size:1.6rem; font-weight:bold; color:#fff;">${formatCurrency(portValue)}</div>
+                        <!-- MARKET HERO - Premium Design -->
+                        <div class="market-hero-stats" style="display:flex; flex-wrap:wrap; gap:15px; margin-bottom:25px;">
+                            <div class="market-stat-card" style="flex:2; min-width: 180px; background: linear-gradient(145deg, rgba(56, 189, 248, 0.1), rgba(14, 165, 233, 0.05)); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 16px; padding: 20px; text-align: center;">
+                                <div style="font-size: 2rem; margin-bottom: 8px; filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.4));">📈</div>
+                                <span style="display:block; color:#94a3b8; font-size:0.75rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom:8px;">Valor Cartera</span>
+                                <span style="font-size:1.5rem; font-weight:800; color:#38bdf8; text-shadow: 0 0 20px rgba(56, 189, 248, 0.3);">${formatCurrency(portValue)}</span>
                             </div>
-                            <div style="border-bottom:1px solid #334155; padding-bottom:12px;">
-                                <div style="font-size:0.75rem; color:#94a3b8; text-transform:uppercase; margin-bottom:4px;">Retorno Total</div>
-                                <div style="font-size:1.6rem; font-weight:bold; color:${returnClass}">${returnDir}${formatCurrency(totalReturn)}</div>
+                            <div class="market-stat-card" style="flex:1.3; min-width: 150px; background: linear-gradient(145deg, ${totalReturn >= 0 ? 'rgba(74, 222, 128, 0.1), rgba(34, 197, 94, 0.05)' : 'rgba(248, 113, 113, 0.1), rgba(239, 68, 68, 0.05)'}); border: 1px solid ${totalReturn >= 0 ? 'rgba(74, 222, 128, 0.3)' : 'rgba(248, 113, 113, 0.3)'}; border-radius: 16px; padding: 20px; text-align: center;">
+                                <div style="font-size: 2rem; margin-bottom: 8px; filter: drop-shadow(0 0 10px ${totalReturn >= 0 ? 'rgba(74, 222, 128, 0.4)' : 'rgba(248, 113, 113, 0.4)'});">${totalReturn >= 0 ? '💰' : '📉'}</div>
+                                <span style="display:block; color:#94a3b8; font-size:0.75rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom:8px;">Retorno Total</span>
+                                <span style="font-size:1.3rem; font-weight:800; color:${returnClass}; text-shadow: 0 0 15px ${totalReturn >= 0 ? 'rgba(74, 222, 128, 0.3)' : 'rgba(248, 113, 113, 0.3)'};">${returnDir}${formatCurrency(totalReturn)}</span>
                             </div>
-                            <div>
-                                <div style="font-size:0.75rem; color:#94a3b8; text-transform:uppercase; margin-bottom:4px;">Rentabilidad</div>
-                                <div style="font-size:1.6rem; font-weight:bold; color:${returnClass}">${costBasis > 0 ? (totalReturn / costBasis * 100).toFixed(2) : '0.00'}%</div>
+
+                            <div class="market-stat-card" style="flex:1; min-width: 140px; background: linear-gradient(145deg, ${totalReturn >= 0 ? 'rgba(74, 222, 128, 0.1), rgba(34, 197, 94, 0.05)' : 'rgba(248, 113, 113, 0.1), rgba(239, 68, 68, 0.05)'}); border: 1px solid ${totalReturn >= 0 ? 'rgba(74, 222, 128, 0.3)' : 'rgba(248, 113, 113, 0.3)'}; border-radius: 16px; padding: 20px; text-align: center;">
+                                <div style="font-size: 2rem; margin-bottom: 8px; filter: drop-shadow(0 0 10px ${totalReturn >= 0 ? 'rgba(74, 222, 128, 0.4)' : 'rgba(248, 113, 113, 0.4)'});">📊</div>
+                                <span style="display:block; color:#94a3b8; font-size:0.75rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom:8px;">Rentabilidad</span>
+                                <span style="font-size:1.3rem; font-weight:800; color:${returnClass}; text-shadow: 0 0 15px ${totalReturn >= 0 ? 'rgba(74, 222, 128, 0.3)' : 'rgba(248, 113, 113, 0.3)'};">${costBasis > 0 ? (totalReturn / costBasis * 100).toFixed(2) : '0.00'}%</span>
                             </div>
                         </div>
 
@@ -2835,21 +2839,32 @@ var UI = {
         // content-body: Scrollable (Chart + Stats)
         // content-footer: Fixed (Buttons)
 
+        const trendColor = stock.trend >= 0 ? '#4ade80' : '#f87171';
+        const trendBg = stock.trend >= 0 ? 'rgba(74, 222, 128, 0.1)' : 'rgba(248, 113, 113, 0.1)';
+        const trendBorder = stock.trend >= 0 ? 'rgba(74, 222, 128, 0.3)' : 'rgba(248, 113, 113, 0.3)';
+        const trendIcon = stock.trend >= 0 ? '📈' : '📉';
+
         const msg = `
-                    <div class="stock-ops-container" style="display:flex; flex-direction:column; height:80vh; max-height:80vh;">
+                    <div class="stock-ops-container" style="display:flex; flex-direction:column; height:80vh; max-height:80vh; position: relative;">
                         
-                        <!-- 1. HEADER (Fixed) -->
-                        <div class="ops-header" style="flex:0 0 auto; border-bottom:1px solid #334155; padding-bottom:10px; margin-bottom:10px;">
-                            <div style="display:flex; justify-content:space-between; align-items:start;">
-                                <div>
-                                    <h3 style="margin:0; font-size:1.3rem; color:white;">${stock.name}</h3>
-                                    <span style="color:#94a3b8; font-size:0.9rem;">${stock.symbol}</span>
+                        <!-- Close Button -->
+                        <button id="btn-close-stock-modal" style="position: absolute; top: 10px; right: 10px; background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.5); color: #f87171; width: 36px; height: 36px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">✕</button>
+
+                        <!-- 1. HEADER (Fixed) - Premium Design -->
+                        <div class="ops-header" style="flex:0 0 auto; background: linear-gradient(145deg, ${trendBg}, transparent); border: 1px solid ${trendBorder}; border-radius: 16px; padding: 20px; margin-bottom: 15px; margin-top: 30px;">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <div style="display: flex; align-items: center; gap: 15px;">
+                                    <div style="font-size: 2.5rem; filter: drop-shadow(0 0 10px ${trendColor});">${trendIcon}</div>
+                                    <div>
+                                        <h3 style="margin:0; font-size:1.4rem; color:white; font-weight: 800;">${stock.symbol}</h3>
+                                        <span style="color:#94a3b8; font-size:0.85rem;">${stock.name}</span>
+                                    </div>
                                 </div>
                                 <div style="text-align:right;">
-                                    <div style="font-size:1.4rem; font-weight:bold; color:${stock.trend >= 0 ? '#4ade80' : '#f87171'}">
+                                    <div style="font-size:1.6rem; font-weight:800; color:${trendColor}; text-shadow: 0 0 15px ${trendColor}40;">
                                         ${formatCurrency(stock.price)}
                                     </div>
-                                    <span style="font-size:0.85rem; color:${stock.trend >= 0 ? '#86efac' : '#fca5a5'}">
+                                    <span style="font-size:0.9rem; color:${trendColor}; font-weight: 600;">
                                         ${stock.trend >= 0 ? '▲' : '▼'} ${(Math.abs(stock.trend) * 100).toFixed(2)}%
                                     </span>
                                 </div>
@@ -2860,50 +2875,53 @@ var UI = {
                         <div class="ops-body" style="flex:1 1 auto; overflow-y:auto; min-height:0; padding-right:5px;">
                             
                             <!-- Chart Container -->
-                            <div style="background:#0f172a; border-radius:8px; padding:10px; margin-bottom:15px; position:relative;">
+                            <div style="background: linear-gradient(145deg, #1e293b, #0f172a); border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid #334155;">
                                 <div style="height:180px; width:100%;">
                                     <canvas id="stock-modal-chart"></canvas>
                                 </div>
-                                <div id="chart-overlay-info" style="position:absolute; top:10px; left:10px; background:rgba(0,0,0,0.5); padding:2px 6px; border-radius:4px; font-size:0.75rem; color:white; pointer-events:none;">
+                                <div id="chart-overlay-info" style="position:absolute; top:10px; left:10px; background:rgba(0,0,0,0.7); padding:4px 10px; border-radius:6px; font-size:0.8rem; color:white; pointer-events:none;">
                                     Rendimiento: <span id="chart-roi-display">--</span>
                                 </div>
                             </div>
 
                             <!-- Timeframe Selectors -->
-                            <div class="timeframe-segmented" style="display:flex; background:#1e293b; padding:4px; border-radius:8px; margin-bottom:20px;">
-                                <button class="btn-seg active" data-tf="24" onclick="UI.changeTimeframe(24)" style="flex:1; background:transparent; border:none; color:#cbd5e1; padding:6px; border-radius:6px;">2 Años</button>
-                                <button class="btn-seg" data-tf="6" onclick="UI.changeTimeframe(6)" style="flex:1; background:transparent; border:none; color:#cbd5e1; padding:6px; border-radius:6px;">6 Meses</button>
-                                <button class="btn-seg" data-tf="999" onclick="UI.changeTimeframe(999)" style="flex:1; background:transparent; border:none; color:#cbd5e1; padding:6px; border-radius:6px;">Todo</button>
+                            <div class="timeframe-segmented" style="display:flex; background:#0f172a; padding:5px; border-radius:10px; margin-bottom:15px; border: 1px solid #334155;">
+                                <button class="btn-seg active" data-tf="24" onclick="UI.changeTimeframe(24)" style="flex:1; background: linear-gradient(135deg, #38bdf8, #0ea5e9); border:none; color:white; padding:10px; border-radius:8px; font-weight: 700; font-size: 0.85rem;">2 Años</button>
+                                <button class="btn-seg" data-tf="6" onclick="UI.changeTimeframe(6)" style="flex:1; background:transparent; border:none; color:#94a3b8; padding:10px; border-radius:8px; font-weight: 600; font-size: 0.85rem;">6 Meses</button>
+                                <button class="btn-seg" data-tf="999" onclick="UI.changeTimeframe(999)" style="flex:1; background:transparent; border:none; color:#94a3b8; padding:10px; border-radius:8px; font-weight: 600; font-size: 0.85rem;">Todo</button>
                             </div>
 
-                            <!-- User Portfolio Stats -->
-                            <div class="portfolio-strip" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px;">
-                                <div style="background:#1e293b; padding:10px; border-radius:8px; text-align:center;">
-                                    <span style="display:block; font-size:0.75rem; color:#94a3b8;">En Cartera</span>
-                                    <span style="font-size:1.1rem; color:white; font-weight:bold;">${owned}</span>
+                            <!-- User Portfolio Stats - Premium Cards -->
+                            <div class="portfolio-strip" style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:15px;">
+                                <div style="background: linear-gradient(145deg, rgba(56, 189, 248, 0.1), rgba(14, 165, 233, 0.05)); border: 1px solid rgba(56, 189, 248, 0.3); padding:15px; border-radius:12px; text-align:center;">
+                                    <div style="font-size: 1.5rem; margin-bottom: 5px;">🎫</div>
+                                    <span style="display:block; font-size:0.7rem; color:#94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">En Cartera</span>
+                                    <span style="font-size:1.3rem; color:#38bdf8; font-weight:800;">${owned}</span>
                                 </div>
-                                <div style="background:#1e293b; padding:10px; border-radius:8px; text-align:center;">
-                                    <span style="display:block; font-size:0.75rem; color:#94a3b8;">Valor Actual</span>
-                                    <span style="font-size:1.1rem; color:#facc15; font-weight:bold;">${formatCurrency(owned * stock.price)}</span>
+                                <div style="background: linear-gradient(145deg, rgba(250, 204, 21, 0.1), rgba(251, 191, 36, 0.05)); border: 1px solid rgba(250, 204, 21, 0.3); padding:15px; border-radius:12px; text-align:center;">
+                                    <div style="font-size: 1.5rem; margin-bottom: 5px;">💰</div>
+                                    <span style="display:block; font-size:0.7rem; color:#94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Valor Actual</span>
+                                    <span style="font-size:1.3rem; color:#facc15; font-weight:800;">${formatCurrency(owned * stock.price)}</span>
                                 </div>
                             </div>
 
                         </div>
 
-                        <!-- 3. FOOTER (Fixed Actions) -->
+                        <!-- 3. FOOTER (Fixed Actions) - Premium Buttons -->
                         <div class="ops-footer" style="flex:0 0 auto; border-top:1px solid #334155; padding-top:15px; margin-top:10px;">
-                            <div style="margin-bottom:10px;">
+                            <div style="margin-bottom:12px;">
                                 <input type="number" id="stock-action-qty" placeholder="Cantidad de Acciones" 
-                                    style="width:100%; padding:12px; background:#1e293b; border:1px solid #475569; border-radius:8px; color:white; font-size:1rem; text-align:center;">
+                                    style="width:100%; padding:14px; background: linear-gradient(145deg, #1e293b, #0f172a); border:1px solid #475569; border-radius:10px; color:white; font-size:1.1rem; text-align:center; font-weight: 600;">
                             </div>
-                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                                <button id="btn-modal-buy" class="btn-action" style="background:#22c55e; color:#0f172a; border:none; padding:12px; border-radius:8px; font-weight:bold; font-size:1rem;">COMPRAR</button>
-                                <button id="btn-modal-sell" class="btn-action" style="background:#ef4444; color:white; border:none; padding:12px; border-radius:8px; font-weight:bold; font-size:1rem;">VENDER</button>
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                                <button id="btn-modal-buy" class="btn-action" style="background: linear-gradient(135deg, #22c55e, #16a34a); color:white; border:none; padding:14px; border-radius:10px; font-weight:700; font-size:1rem; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; transition: all 0.2s;">COMPRAR</button>
+                                <button id="btn-modal-sell" class="btn-action" style="background: linear-gradient(135deg, #ef4444, #dc2626); color:white; border:none; padding:14px; border-radius:10px; font-weight:700; font-size:1rem; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; transition: all 0.2s;">VENDER</button>
                             </div>
                         </div>
 
                     </div>
                     `;
+
 
         // Overwrite the default modal buttons logic by passing empty array
         // We handle buttons manually inside the HTML
@@ -2915,6 +2933,12 @@ var UI = {
             // Title fix (hack to remove default header if showModal adds one)
             const modalTitle = document.querySelector('#modal-content h2');
             if (modalTitle) modalTitle.style.display = 'none'; // Hide default title
+
+            // Close button handler
+            document.getElementById('btn-close-stock-modal').onclick = (e) => {
+                const overlay = e.target.closest('.custom-modal-overlay');
+                if (overlay) overlay.remove();
+            };
 
             document.getElementById('btn-modal-buy').onclick = (e) => {
                 const qty = parseInt(document.getElementById('stock-action-qty').value);
@@ -3218,19 +3242,22 @@ var UI = {
                             <span style="color:#94a3b8; font-size:0.9rem;">Propiedades: ${owned.length}</span>
                         </div>
 
-                        <!-- HERO STATS -->
-                        <div class="re-stats-container" style="display:flex; flex-wrap:wrap; gap:15px; margin-bottom:20px;">
-                            <div class="portfolio-stat re-stat-card" style="flex:2; background:#1e293b; padding:15px; border-radius:12px; border:1px solid #334155; text-align:center; min-width: 200px;">
-                                <span class="label" style="display:block; color:#94a3b8; font-size:0.85rem; margin-bottom:5px;">Patrimonio Neto</span>
-                                <span class="value" style="font-size:1.4rem; font-weight:bold; color:#facc15;">${formatCurrency(totalEquity)}</span>
+                        <!-- HERO STATS - Premium Design -->
+                        <div class="re-stats-container" style="display:flex; flex-wrap:wrap; gap:15px; margin-bottom:25px;">
+                            <div class="re-stat-card" style="flex:2; min-width: 200px; background: linear-gradient(145deg, rgba(250, 204, 21, 0.1), rgba(251, 191, 36, 0.05)); border: 1px solid rgba(250, 204, 21, 0.3); border-radius: 16px; padding: 20px; text-align: center; position: relative; overflow: hidden;">
+                                <div style="font-size: 2rem; margin-bottom: 8px; filter: drop-shadow(0 0 10px rgba(250, 204, 21, 0.4));">🏛️</div>
+                                <span style="display:block; color:#94a3b8; font-size:0.75rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom:8px;">Patrimonio Neto</span>
+                                <span style="font-size:1.6rem; font-weight:800; color:#facc15; text-shadow: 0 0 20px rgba(250, 204, 21, 0.3);">${formatCurrency(totalEquity)}</span>
                             </div>
-                             <div class="portfolio-stat re-stat-card" style="flex:1; background:#1e293b; padding:15px; border-radius:12px; border:1px solid #334155; text-align:center; min-width: 140px;">
-                                <span class="label" style="display:block; color:#94a3b8; font-size:0.85rem; margin-bottom:5px;">Rentas / mes</span>
-                                <span class="value" style="font-size:1.1rem; font-weight:bold; color:#4ade80;">+${formatCurrency(totalRent)}</span>
+                            <div class="re-stat-card" style="flex:1; min-width: 140px; background: linear-gradient(145deg, rgba(74, 222, 128, 0.1), rgba(34, 197, 94, 0.05)); border: 1px solid rgba(74, 222, 128, 0.3); border-radius: 16px; padding: 20px; text-align: center; position: relative; overflow: hidden;">
+                                <div style="font-size: 2rem; margin-bottom: 8px; filter: drop-shadow(0 0 10px rgba(74, 222, 128, 0.4));">💰</div>
+                                <span style="display:block; color:#94a3b8; font-size:0.75rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom:8px;">Rentas / mes</span>
+                                <span style="font-size:1.3rem; font-weight:800; color:#4ade80; text-shadow: 0 0 15px rgba(74, 222, 128, 0.3);">+${formatCurrency(totalRent)}</span>
                             </div>
-                            <div class="portfolio-stat re-stat-card" style="flex:1; background:#1e293b; padding:15px; border-radius:12px; border:1px solid #334155; text-align:center; min-width: 140px;">
-                                <span class="label" style="display:block; color:#94a3b8; font-size:0.85rem; margin-bottom:5px;">Deudas / mes</span>
-                                <span class="value" style="font-size:1.1rem; font-weight:bold; color:#f87171;">-${formatCurrency(totalMortgagePayment)}</span>
+                            <div class="re-stat-card" style="flex:1; min-width: 140px; background: linear-gradient(145deg, rgba(248, 113, 113, 0.1), rgba(239, 68, 68, 0.05)); border: 1px solid rgba(248, 113, 113, 0.3); border-radius: 16px; padding: 20px; text-align: center; position: relative; overflow: hidden;">
+                                <div style="font-size: 2rem; margin-bottom: 8px; filter: drop-shadow(0 0 10px rgba(248, 113, 113, 0.4));">🏦</div>
+                                <span style="display:block; color:#94a3b8; font-size:0.75rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom:8px;">Hipotecas / mes</span>
+                                <span style="font-size:1.3rem; font-weight:800; color:#f87171; text-shadow: 0 0 15px rgba(248, 113, 113, 0.3);">-${formatCurrency(totalMortgagePayment)}</span>
                             </div>
                         </div>
 
@@ -5026,22 +5053,54 @@ var UI = {
 
                         const pathName = UI.getLabel(vac.path);
 
+                        // Job icon based on career path (same function as eligible)
+                        const getJobIcon = (path) => {
+                            const icons = {
+                                'unskilled': '🛒',
+                                'tres_deporte': '👟',
+                                'admin_contable': '📋',
+                                'gestor_cobros': '💳',
+                                'admin_inmo': '🏘️',
+                                'prog_apps': '💻',
+                                'sys_support': '🖥️',
+                                'mobile_dev': '📱',
+                                'maint_ind': '🔧',
+                                'clima': '❄️',
+                                'buildings': '🏢',
+                                'analyst_fin': '📊',
+                                'pm_marketing': '📣',
+                                'consultant': '💼',
+                                'data_science': '🧠',
+                                'software_eng': '⌨️',
+                                'devops': '🚀',
+                                'civil_eng': '🏗️',
+                                'site_works': '🦺',
+                                'project_mgmt': '📐',
+                                'temporary': '⏰'
+                            };
+                            return icons[path] || '💼';
+                        };
+
+                        const jobIcon = getJobIcon(vac.path);
+
                         card.innerHTML = `
+                                <div class="job-icon" style="opacity:0.5;">${jobIcon}</div>
                                 <div class="market-card-top">
                                     <h4 style="color:#cbd5e1">${vac.title}</h4>
                                     <span class="market-path">${pathName}</span>
                                 </div>
                                 <div class="market-tags">
                                     <span class="tag">Nivel Inicial</span>
-                                    ${eduText ? `<span class="tag tag-edu" style="background:transparent; border:1px solid #ef4444; color:#ef4444;">Req: ${eduText}</span>` : ''}
+                                    ${eduText ? `<span class="tag tag-edu" style="background:rgba(239, 68, 68, 0.1); border:1px solid #ef4444; color:#ef4444;">🔒 ${eduText}</span>` : ''}
                                 </div>
                                 <div class="market-footer">
                                     <div class="market-salary">${formatCurrency(vac.salary)}</div>
-                                    <button class="btn-apply-small" disabled style="background:#475569; opacity:0.5; cursor:not-allowed;">Falta Título</button>
+                                    <button class="btn-apply-small" disabled>Falta Título</button>
                                 </div>
                             `;
                         lockedGrid.appendChild(card);
                     });
+
 
                     details.appendChild(lockedGrid);
                     marketSection.appendChild(details);
