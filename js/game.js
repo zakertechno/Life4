@@ -247,7 +247,9 @@ function updateNetWorth() {
 var ChartModule = {
     instance: null,
 
-    drawChart(canvasId, history) {
+    instance: null,
+
+    drawChart(canvasId, history, visibility = { netWorth: true, cash: true, debt: true }) {
         const ctx = document.getElementById(canvasId).getContext('2d');
 
         // Destroy previous to avoid overlay
@@ -264,42 +266,52 @@ var ChartModule = {
         gradientCash.addColorStop(0, 'rgba(74, 222, 128, 0.4)'); // Green
         gradientCash.addColorStop(1, 'rgba(74, 222, 128, 0.0)');
 
+        const datasets = [];
+
+        if (visibility.netWorth) {
+            datasets.push({
+                label: 'P/n',
+                data: history.netWorth,
+                borderColor: '#facc15',
+                backgroundColor: gradientNW,
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 0
+            });
+        }
+
+        if (visibility.cash) {
+            datasets.push({
+                label: 'Efectivo',
+                data: history.cash,
+                borderColor: '#4ade80', // Green
+                backgroundColor: gradientCash,
+                borderWidth: 2,
+                borderDash: [5, 5],
+                fill: true,
+                tension: 0.4,
+                pointRadius: 0
+            });
+        }
+
+        if (visibility.debt) {
+            datasets.push({
+                label: 'Deuda',
+                data: history.debt,
+                borderColor: '#f87171', // Red
+                borderWidth: 2,
+                fill: false,
+                tension: 0.4,
+                pointRadius: 0
+            });
+        }
+
         this.instance = new Chart(ctx, {
             type: 'line',
             data: {
                 labels: history.labels,
-                datasets: [
-                    {
-                        label: 'P/n',
-                        data: history.netWorth,
-                        borderColor: '#facc15',
-                        backgroundColor: gradientNW,
-                        borderWidth: 3,
-                        fill: true,
-                        tension: 0.4,
-                        pointRadius: 0
-                    },
-                    {
-                        label: 'Liquidez',
-                        data: history.cash,
-                        borderColor: '#4ade80', // Green
-                        backgroundColor: gradientCash,
-                        borderWidth: 2,
-                        borderDash: [5, 5],
-                        fill: true,
-                        tension: 0.4,
-                        pointRadius: 0
-                    },
-                    {
-                        label: 'Deuda',
-                        data: history.debt,
-                        borderColor: '#f87171', // Red
-                        borderWidth: 2,
-                        fill: false,
-                        tension: 0.4,
-                        pointRadius: 0
-                    }
-                ]
+                datasets: datasets
             },
             options: {
                 responsive: true,
@@ -2449,6 +2461,17 @@ var UI = {
     chartTimeframe: 24, // Default 2 years
     stockChartTimeframe: 24,
     currentOpenStock: null,
+
+    // Chart Visibility State
+    chartVisibleDatasets: { netWorth: true, cash: true, debt: true },
+
+    toggleChartDataset(key) {
+        if (this.chartVisibleDatasets[key] !== undefined) {
+            this.chartVisibleDatasets[key] = !this.chartVisibleDatasets[key];
+            this.updateDashboard();
+        }
+    },
+
     // State for animations
     lastCash: 0,
     lastNetWorth: 0,
@@ -2596,7 +2619,7 @@ var UI = {
         let reEquity = reValue - reMortgage;
 
         let rentIncome = GameState.inventory.realEstate.reduce((acc, p) => acc + p.monthlyRent, 0);
-        let holdingIncome = (GameState.ownedCompanies || []).reduce((acc, c) => acc + (c.baselineProfit || 0), 0);
+        let holdingIncome = (GameState.ownedCompanies || []).reduce((acc, c) => acc + (c.profitLastMonth !== undefined ? c.profitLastMonth : (c.baselineProfit || 0)), 0);
         // Also add active company profit if receiving salary/dividends or just raw profit?
         // Request says "beneficio mes", usually implies net profit of the company.
         if (GameState.company) {
@@ -2663,19 +2686,19 @@ var UI = {
                     <div style="height:300px; width:100%;">
                         <canvas id="net-worth-chart"></canvas>
                     </div>
-                    <!-- Custom Chart Legend -->
+                    <!-- Custom Chart Legend (Interactive) -->
                     <div style="display: flex; justify-content: center; gap: 20px; margin-top: 15px; padding-top: 15px; border-top: 1px solid #334155;">
-                        <div style="display: flex; align-items: center; gap: 8px;">
+                        <div onclick="UI.toggleChartDataset('netWorth')" style="display: flex; align-items: center; gap: 8px; cursor: pointer; opacity: ${UI.chartVisibleDatasets.netWorth ? '1' : '0.4'}; transition: opacity 0.2s;">
                             <div style="width: 12px; height: 12px; background: #facc15; border-radius: 50%; box-shadow: 0 0 8px rgba(250, 204, 21, 0.5);"></div>
-                            <span style="color: #facc15; font-size: 0.85rem; font-weight: 600;">Patrimonio</span>
+                            <span style="color: #facc15; font-size: 0.85rem; font-weight: 600; text-decoration: ${UI.chartVisibleDatasets.netWorth ? 'none' : 'line-through'};">Patrimonio</span>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 8px;">
+                        <div onclick="UI.toggleChartDataset('cash')" style="display: flex; align-items: center; gap: 8px; cursor: pointer; opacity: ${UI.chartVisibleDatasets.cash ? '1' : '0.4'}; transition: opacity 0.2s;">
                             <div style="width: 12px; height: 3px; background: #4ade80; border-radius: 2px; box-shadow: 0 0 8px rgba(74, 222, 128, 0.5);"></div>
-                            <span style="color: #4ade80; font-size: 0.85rem; font-weight: 600;">Liquidez</span>
+                            <span style="color: #4ade80; font-size: 0.85rem; font-weight: 600; text-decoration: ${UI.chartVisibleDatasets.cash ? 'none' : 'line-through'};">Efectivo</span>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 8px;">
+                        <div onclick="UI.toggleChartDataset('debt')" style="display: flex; align-items: center; gap: 8px; cursor: pointer; opacity: ${UI.chartVisibleDatasets.debt ? '1' : '0.4'}; transition: opacity 0.2s;">
                             <div style="width: 12px; height: 3px; background: #f87171; border-radius: 2px; box-shadow: 0 0 8px rgba(248, 113, 113, 0.5);"></div>
-                            <span style="color: #f87171; font-size: 0.85rem; font-weight: 600;">Deuda</span>
+                            <span style="color: #f87171; font-size: 0.85rem; font-weight: 600; text-decoration: ${UI.chartVisibleDatasets.debt ? 'none' : 'line-through'};">Deuda</span>
                         </div>
                     </div>
                 </div>
@@ -2687,7 +2710,7 @@ var UI = {
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom:20px;">
                         <div style="background: linear-gradient(145deg, rgba(74, 222, 128, 0.08), transparent); padding: 15px; border-radius: 12px; border: 1px solid rgba(74, 222, 128, 0.2);">
                             <div style="font-size: 1.5rem; margin-bottom: 5px;">💵</div>
-                            <div style="font-size:0.7rem; color:#94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Liquidez</div>
+                            <div style="font-size:0.7rem; color:#94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Efectivo</div>
                             <div style="font-size:1.2rem; font-weight:800; color:#4ade80;">${formatCurrency(cash)}</div>
                         </div>
                         <div style="background: linear-gradient(145deg, rgba(56, 189, 248, 0.08), transparent); padding: 15px; border-radius: 12px; border: 1px solid rgba(56, 189, 248, 0.2);">
@@ -2730,7 +2753,7 @@ var UI = {
             cash: h.cash.slice(-limit),
             debt: h.debt.slice(-limit)
         };
-        ChartModule.drawChart('net-worth-chart', slicedHistory);
+        ChartModule.drawChart('net-worth-chart', slicedHistory, UI.chartVisibleDatasets);
     },
     updateMarket() {
         const container = document.getElementById('market-view');
@@ -3700,9 +3723,38 @@ var UI = {
                 priceClass = 'color: #fca5a5; font-weight:bold;'; // Light red for cost
             }
 
-            // Check if this location is locked
-            const isPremiumLocation = (key === 'downtown' || key === 'business_district');
-            const isLocked = isPremiumLocation && !premiumLocationsUnlocked;
+            // Custom Requirement Logic
+            let isLocked = false;
+            let lockReason = '';
+
+            // 1. Check if Premium Location
+            const isPremium = (key === 'downtown' || key === 'business_district');
+
+            if (isPremium) {
+                // If Cafe, use specific progression: Suburbs -> Downtown -> Business
+                if (state.typeId === 'cafe') {
+                    const hasAutoOuter = (GameState.ownedCompanies || []).some(c => c.typeId === 'cafe' && c.locationId === 'suburbs');
+                    const hasAutoDowntown = (GameState.ownedCompanies || []).some(c => c.typeId === 'cafe' && c.locationId === 'downtown');
+
+                    if (key === 'downtown') {
+                        if (!hasAutoOuter) {
+                            isLocked = true;
+                            lockReason = 'Req: 1 Cafetería Automatizada en Afueras';
+                        }
+                    } else if (key === 'business_district') {
+                        if (!hasAutoDowntown) {
+                            isLocked = true;
+                            lockReason = 'Req: 1 Cafetería Automatizada en Centro';
+                        }
+                    }
+                } else {
+                    // GENERIC FALLBACK (Old Logic)
+                    if (!premiumLocationsUnlocked) {
+                        isLocked = true;
+                        lockReason = 'Req: 2+ Negocios Activos';
+                    }
+                }
+            }
 
             const card = document.createElement('div');
             card.className = 'loc-tier-card';
