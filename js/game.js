@@ -2499,6 +2499,10 @@ var UI = {
         if (pName) {
             pName.textContent = GameState.playerName || 'Jugador';
         }
+        const pNameDesktop = document.getElementById('header-player-name-desktop');
+        if (pNameDesktop) {
+            pNameDesktop.textContent = GameState.playerName || 'Jugador';
+        }
     },
 
     // --- MODALS ---
@@ -6783,7 +6787,7 @@ try {
                         
                         <div class="profile-input-group">
                             <label>Tu Nombre</label>
-                            <input type="text" id="start-player-name" placeholder="¿Cómo te llamas?">
+                            <input type="text" id="start-player-name" placeholder="¿Cómo te llamas?" maxlength="20">
                         </div>
                         
                         <button id="btn-start-game-custom" class="profile-start-btn">🎮 Empezar Aventura</button>

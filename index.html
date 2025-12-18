@@ -157,15 +157,32 @@
 
     <div id="app">
         <!-- Game Title - Premium Design -->
-        <div
-            style="text-align:center; padding:12px 20px; background: linear-gradient(135deg, #0f172a, #1e293b, #0f172a); border-bottom: 2px solid transparent; background-clip: padding-box; position: relative;">
+        <div id="top-bar-container"
+            style="text-align:center; padding:12px 20px; background: linear-gradient(135deg, #0f172a, #1e293b, #0f172a); border-bottom: 2px solid transparent; background-clip: padding-box; position: relative; display: flex; align-items: center; justify-content: center;">
             <div
                 style="position: absolute; inset: 0; border-bottom: 2px solid; border-image: linear-gradient(90deg, transparent, #facc15, #f59e0b, #facc15, transparent) 1;">
             </div>
+
+            <!-- DESKTOP LEFT: User -->
+            <button id="desktop-home-btn" class="home-btn desktop-only-btn"
+                onclick="document.querySelector('.nav-btn[data-view=&quot;dashboard&quot;]').click()"
+                style="position: absolute; left: 20px; z-index: 10;">
+                <span class="home-icon">🏠</span>
+                <div id="header-player-name-desktop" style="font-weight: 700; color: #fbbf24; margin-left:8px;">Jugador
+                </div>
+            </button>
+
             <h1
                 style="margin: 0; font-size: 1.4rem; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; background: linear-gradient(90deg, #fcd34d, #facc15, #f59e0b, #facc15, #fcd34d); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; text-shadow: none; filter: drop-shadow(0 0 10px rgba(250, 204, 21, 0.3));">
                 🎮 El Juego de Sergio 🎮
             </h1>
+
+            <!-- DESKTOP RIGHT: Save -->
+            <button id="desktop-save-btn" class="save-btn desktop-only-btn" onclick="PersistenceModule.showSaveModal()"
+                style="position: absolute; right: 20px; z-index: 10;">
+                <span>💾</span>
+                <span>Guardar</span>
+            </button>
         </div>
 
         <header class="app-header">
