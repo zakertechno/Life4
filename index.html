@@ -335,70 +335,27 @@
                 margin-top: 2px;
             }
 
-            /* Mobile - 2 ROWS: Row1 [💰...][💾] Row2 [🏠][BUTTON...] */
+            /* Mobile - 2 ROWS using CSS Grid */
             @media (max-width: 768px) {
                 .app-header {
                     display: grid !important;
-                    grid-template-columns: 1fr auto !important;
+                    grid-template-columns: auto 1fr auto !important;
                     grid-template-rows: auto auto !important;
-                    gap: 8px !important;
+                    gap: 6px 8px !important;
                     padding: 8px 12px !important;
                 }
 
-                /* Row 1: [💰 expanded] [💾] */
-                .header-right {
+                /* Row 1: [🏠] [💰 expanded] [💾] */
+                .header-left {
                     grid-column: 1 / 2 !important;
                     grid-row: 1 !important;
-                    display: flex !important;
-                    justify-content: flex-start !important;
-                }
-
-                .header-left {
-                    grid-column: 2 / 3 !important;
-                    grid-row: 1 !important;
-                    display: flex !important;
-                    flex-direction: row !important;
-                    justify-content: flex-end !important;
-                    align-items: center !important;
-                }
-
-                .header-left .home-btn {
-                    position: absolute !important;
-                    left: 12px !important;
-                    top: auto !important;
-                    bottom: auto !important;
-                    grid-row: 2 !important;
-                    display: flex !important;
-                }
-
-                /* Row 2: [🏠] [BUTTON expanded] */
-                .header-center {
-                    grid-column: 1 / 3 !important;
-                    grid-row: 2 !important;
-                    display: flex !important;
-                    justify-content: flex-end !important;
-                    align-items: center !important;
-                    padding-left: 50px !important;
-                }
-
-                #next-turn-btn {
-                    flex: 1 !important;
-                    padding: 12px 20px !important;
-                    font-size: 0.8rem !important;
-                    box-shadow: 0 0 15px rgba(59, 130, 246, 0.6) !important;
-                }
-
-                .save-btn {
-                    padding: 8px 12px !important;
-                    font-size: 0.8rem !important;
-                }
-
-                .save-btn span:last-child {
-                    display: none !important;
+                    display: contents !important;
                 }
 
                 .home-btn {
-                    padding: 8px 12px !important;
+                    grid-column: 1 / 2 !important;
+                    grid-row: 1 !important;
+                    padding: 6px 10px !important;
                 }
 
                 .home-btn::before {
@@ -406,16 +363,36 @@
                 }
 
                 .home-icon {
-                    font-size: 1.1rem !important;
+                    font-size: 1rem !important;
                 }
 
                 #header-player-name {
                     display: none !important;
                 }
 
+                .save-btn {
+                    grid-column: 3 / 4 !important;
+                    grid-row: 1 !important;
+                    padding: 6px 10px !important;
+                    font-size: 0.75rem !important;
+                }
+
+                .save-btn span:last-child {
+                    display: none !important;
+                }
+
+                .header-right {
+                    grid-column: 2 / 3 !important;
+                    grid-row: 1 !important;
+                    display: flex !important;
+                    justify-content: center !important;
+                    align-items: center !important;
+                }
+
                 .money-card {
-                    padding: 6px 12px !important;
+                    padding: 6px 15px !important;
                     flex: 1 !important;
+                    justify-content: center !important;
                 }
 
                 .money-icon {
@@ -424,10 +401,31 @@
 
                 #money-display {
                     font-size: 1rem !important;
+                    font-weight: 900 !important;
+                    text-align: center !important;
                 }
 
                 #date-display {
                     font-size: 0.6rem !important;
+                    text-align: center !important;
+                }
+
+                .money-card>div {
+                    text-align: center !important;
+                }
+
+                /* Row 2: Button full width centered */
+                .header-center {
+                    grid-column: 1 / 4 !important;
+                    grid-row: 2 !important;
+                    display: flex !important;
+                    justify-content: center !important;
+                }
+
+                #next-turn-btn {
+                    padding: 12px 30px !important;
+                    font-size: 0.8rem !important;
+                    box-shadow: 0 0 15px rgba(59, 130, 246, 0.6) !important;
                 }
             }
         </style>
