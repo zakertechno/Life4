@@ -3872,82 +3872,55 @@
 
         .app-header #next-turn-btn {
             position: relative;
-            background: linear-gradient(135deg, #22c55e, #16a34a, #15803d);
+            background: linear-gradient(180deg,
+                    #4ade80 0%,
+                    #22c55e 30%,
+                    #16a34a 70%,
+                    #15803d 100%);
             color: white;
             border: none;
-            padding: 16px 45px;
-            border-radius: 50px;
+            padding: 18px 50px;
+            border-radius: 14px;
             font-weight: 900;
-            font-size: 1.1rem;
+            font-size: 1.15rem;
             cursor: pointer;
             text-transform: uppercase;
             letter-spacing: 2px;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            text-shadow:
+                0 2px 0 rgba(0, 0, 0, 0.25),
+                0 3px 6px rgba(0, 0, 0, 0.3);
             box-shadow:
-                0 0 20px rgba(34, 197, 94, 0.6),
-                0 0 40px rgba(34, 197, 94, 0.4),
-                0 0 60px rgba(34, 197, 94, 0.2),
-                inset 0 -3px 10px rgba(0, 0, 0, 0.2),
-                inset 0 3px 10px rgba(255, 255, 255, 0.2);
-            transition: all 0.3s ease;
+                /* 3D depth layers */
+                0 6px 0 #15803d,
+                0 8px 0 #166534,
+                0 10px 0 #14532d,
+                /* Glow effect */
+                0 15px 25px rgba(34, 197, 94, 0.35),
+                /* Inner top highlight */
+                inset 0 2px 3px rgba(255, 255, 255, 0.4);
+            transition: all 0.12s ease;
             overflow: hidden;
             z-index: 1;
-            animation: pulse-glow 2s ease-in-out infinite;
+            transform: translateY(0);
         }
 
-        /* Animated shine effect */
+        /* 3D Glass highlight on top */
         .app-header #next-turn-btn::before {
             content: '';
             position: absolute;
             top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg,
-                    transparent,
-                    rgba(255, 255, 255, 0.3),
-                    transparent);
-            transition: left 0.5s ease;
-            z-index: -1;
+            left: 0;
+            right: 0;
+            height: 50%;
+            background: linear-gradient(180deg,
+                    rgba(255, 255, 255, 0.3) 0%,
+                    rgba(255, 255, 255, 0.1) 50%,
+                    transparent 100%);
+            border-radius: 14px 14px 50px 50px;
+            pointer-events: none;
         }
 
-        .app-header #next-turn-btn:hover::before {
-            left: 100%;
-        }
-
-        /* Outer glow ring */
-        .app-header #next-turn-btn::after {
-            content: '';
-            position: absolute;
-            inset: -3px;
-            border-radius: 53px;
-            background: linear-gradient(135deg, #4ade80, #22c55e, #16a34a, #22c55e, #4ade80);
-            background-size: 300% 300%;
-            animation: gradient-rotate 3s ease infinite;
-            z-index: -2;
-        }
-
-        @keyframes pulse-glow {
-
-            0%,
-            100% {
-                box-shadow:
-                    0 0 20px rgba(34, 197, 94, 0.6),
-                    0 0 40px rgba(34, 197, 94, 0.4),
-                    0 0 60px rgba(34, 197, 94, 0.2),
-                    inset 0 -3px 10px rgba(0, 0, 0, 0.2),
-                    inset 0 3px 10px rgba(255, 255, 255, 0.2);
-            }
-
-            50% {
-                box-shadow:
-                    0 0 30px rgba(34, 197, 94, 0.8),
-                    0 0 60px rgba(34, 197, 94, 0.6),
-                    0 0 90px rgba(34, 197, 94, 0.4),
-                    inset 0 -3px 10px rgba(0, 0, 0, 0.2),
-                    inset 0 3px 10px rgba(255, 255, 255, 0.2);
-            }
-        }
+        /* Remove outer glow ring for cleaner 3D look */
 
         @keyframes gradient-rotate {
             0% {
@@ -3964,23 +3937,39 @@
         }
 
         .app-header #next-turn-btn:hover {
-            transform: scale(1.1) translateY(-2px);
-            background: linear-gradient(135deg, #4ade80, #22c55e, #16a34a);
+            transform: translateY(-3px);
+            background: linear-gradient(180deg,
+                    #86efac 0%,
+                    #4ade80 30%,
+                    #22c55e 70%,
+                    #16a34a 100%);
             box-shadow:
-                0 0 40px rgba(74, 222, 128, 1),
-                0 0 80px rgba(34, 197, 94, 0.8),
-                0 0 120px rgba(22, 163, 74, 0.5),
-                0 10px 30px rgba(0, 0, 0, 0.3),
-                inset 0 -3px 10px rgba(0, 0, 0, 0.2),
-                inset 0 3px 10px rgba(255, 255, 255, 0.3);
+                /* Extended 3D depth on hover */
+                0 9px 0 #15803d,
+                0 11px 0 #166534,
+                0 13px 0 #14532d,
+                /* Stronger glow */
+                0 20px 35px rgba(74, 222, 128, 0.45),
+                /* Inner highlight */
+                inset 0 2px 3px rgba(255, 255, 255, 0.5);
         }
 
         .app-header #next-turn-btn:active {
-            transform: scale(0.95) translateY(0);
+            transform: translateY(8px) scale(0.98);
+            transition: all 0.08s ease-out;
+            background: linear-gradient(180deg,
+                    #22c55e 0%,
+                    #16a34a 30%,
+                    #15803d 70%,
+                    #166534 100%);
             box-shadow:
-                0 0 15px rgba(34, 197, 94, 0.5),
-                0 0 30px rgba(34, 197, 94, 0.3),
-                inset 0 3px 15px rgba(0, 0, 0, 0.3);
+                /* Pressed - no depth */
+                0 1px 0 #14532d,
+                /* Minimal glow */
+                0 3px 8px rgba(34, 197, 94, 0.2),
+                /* Inner pressed shadow for physical feel */
+                inset 0 4px 8px rgba(0, 0, 0, 0.35),
+                inset 0 1px 2px rgba(0, 0, 0, 0.2);
         }
 
         /* Right - Money Display - Premium Design */
