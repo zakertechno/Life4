@@ -96,25 +96,126 @@
         }
 
         .nav-btn {
-            background-color: var(--card-bg);
-            border: 1px solid transparent;
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));
+            border: 1px solid rgba(148, 163, 184, 0.15);
             color: var(--text-secondary);
-            padding: 10px 20px;
-            border-radius: 8px;
+            padding: 12px 20px;
+            border-radius: 12px;
             cursor: pointer;
             font-family: var(--font-main);
-            transition: all 0.2s;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
         }
 
         .nav-btn:hover {
-            background-color: #334155;
+            background: linear-gradient(145deg, rgba(51, 65, 85, 0.95), rgba(30, 41, 59, 0.98));
             color: var(--text-primary);
+            border-color: rgba(56, 189, 248, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3), 0 0 20px rgba(56, 189, 248, 0.15);
+        }
+
+        .nav-btn:hover::before {
+            opacity: 1;
         }
 
         .nav-btn.active {
-            background-color: var(--accent-color);
-            color: #0f172a;
+            background: linear-gradient(145deg, rgba(56, 189, 248, 0.2), rgba(14, 165, 233, 0.15));
+            color: #fff;
             font-weight: 600;
+            border-color: rgba(56, 189, 248, 0.6);
+            box-shadow: 0 0 25px rgba(56, 189, 248, 0.3), inset 0 0 20px rgba(56, 189, 248, 0.1);
+        }
+
+        .nav-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #38bdf8, transparent);
+            border-radius: 3px;
+        }
+
+        /* Individual tab accent colors on hover */
+        .nav-btn[data-view="dashboard"]:hover {
+            border-color: rgba(56, 189, 248, 0.5);
+        }
+
+        .nav-btn[data-view="education"]:hover {
+            border-color: rgba(168, 85, 247, 0.5);
+        }
+
+        .nav-btn[data-view="lifestyle"]:hover {
+            border-color: rgba(248, 113, 113, 0.5);
+        }
+
+        .nav-btn[data-view="job"]:hover {
+            border-color: rgba(251, 191, 36, 0.5);
+        }
+
+        .nav-btn[data-view="bank"]:hover {
+            border-color: rgba(74, 222, 128, 0.5);
+        }
+
+        .nav-btn[data-view="real-estate"]:hover {
+            border-color: rgba(251, 146, 60, 0.5);
+        }
+
+        .nav-btn[data-view="market"]:hover {
+            border-color: rgba(59, 130, 246, 0.5);
+        }
+
+        /* Active state individual colors */
+        .nav-btn[data-view="dashboard"].active {
+            border-color: rgba(56, 189, 248, 0.7);
+            box-shadow: 0 0 25px rgba(56, 189, 248, 0.3), inset 0 0 20px rgba(56, 189, 248, 0.1);
+        }
+
+        .nav-btn[data-view="education"].active {
+            border-color: rgba(168, 85, 247, 0.7);
+            box-shadow: 0 0 25px rgba(168, 85, 247, 0.3), inset 0 0 20px rgba(168, 85, 247, 0.1);
+        }
+
+        .nav-btn[data-view="lifestyle"].active {
+            border-color: rgba(248, 113, 113, 0.7);
+            box-shadow: 0 0 25px rgba(248, 113, 113, 0.3), inset 0 0 20px rgba(248, 113, 113, 0.1);
+        }
+
+        .nav-btn[data-view="job"].active {
+            border-color: rgba(251, 191, 36, 0.7);
+            box-shadow: 0 0 25px rgba(251, 191, 36, 0.3), inset 0 0 20px rgba(251, 191, 36, 0.1);
+        }
+
+        .nav-btn[data-view="bank"].active {
+            border-color: rgba(74, 222, 128, 0.7);
+            box-shadow: 0 0 25px rgba(74, 222, 128, 0.3), inset 0 0 20px rgba(74, 222, 128, 0.1);
+        }
+
+        .nav-btn[data-view="real-estate"].active {
+            border-color: rgba(251, 146, 60, 0.7);
+            box-shadow: 0 0 25px rgba(251, 146, 60, 0.3), inset 0 0 20px rgba(251, 146, 60, 0.1);
+        }
+
+        .nav-btn[data-view="market"].active {
+            border-color: rgba(59, 130, 246, 0.7);
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.3), inset 0 0 20px rgba(59, 130, 246, 0.1);
         }
 
         .view {
@@ -2844,25 +2945,46 @@
                 top: 0;
                 left: 0;
                 width: 100%;
-                background: rgba(15, 23, 42, 0.95);
-                backdrop-filter: blur(10px);
-                border-bottom: 1px solid #334155;
+                background: linear-gradient(180deg, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.92));
+                backdrop-filter: blur(20px);
+                border-bottom: 1px solid rgba(56, 189, 248, 0.15);
                 z-index: 1000;
                 padding-top: env(safe-area-inset-top);
+                box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
             }
 
             .b-nav-item {
                 background: none;
                 border: none;
-                color: #94a3b8;
-                padding: 10px 0;
+                color: #64748b;
+                padding: 12px 0 10px;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
                 justify-content: center;
                 gap: 4px;
-                font-size: 0.7rem;
+                font-size: 0.65rem;
+                font-weight: 500;
                 cursor: pointer;
+                position: relative;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .b-nav-item::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 0;
+                height: 3px;
+                background: linear-gradient(90deg, transparent, currentColor, transparent);
+                border-radius: 0 0 3px 3px;
+                transition: width 0.3s ease;
+            }
+
+            .b-nav-item.active::before {
+                width: 70%;
             }
 
             .b-nav-item.active {
@@ -2870,7 +2992,44 @@
             }
 
             .b-nav-item .icon {
-                font-size: 1.2rem;
+                font-size: 1.4rem;
+                transition: transform 0.2s ease, filter 0.3s ease;
+            }
+
+            .b-nav-item.active .icon {
+                transform: scale(1.1);
+                filter: drop-shadow(0 0 8px currentColor);
+            }
+
+            .b-nav-item .label {
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                transition: opacity 0.2s;
+            }
+
+            /* Individual accent colors for mobile nav */
+            .b-nav-item[data-view="education"].active {
+                color: #a855f7;
+            }
+
+            .b-nav-item[data-view="lifestyle"].active {
+                color: #f87171;
+            }
+
+            .b-nav-item[data-view="job"].active {
+                color: #fbbf24;
+            }
+
+            .b-nav-item[data-view="bank"].active {
+                color: #4ade80;
+            }
+
+            .b-nav-item[data-view="real-estate"].active {
+                color: #fb923c;
+            }
+
+            .b-nav-item[data-view="market"].active {
+                color: #3b82f6;
             }
 
             /* View Container - add top spacing for separation from sticky nav */
@@ -3080,7 +3239,7 @@
                 font-size: 0.75rem !important;
                 margin: 0;
             }
-            
+
             .kpi-sub {
                 font-size: 0.7rem !important;
                 display: block !important;
