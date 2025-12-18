@@ -3715,88 +3715,86 @@ var UI = {
             typeGrid.appendChild(card);
         }
 
-        // RENDER STEP 2: LOCATIONS
-        locGrid.innerHTML = '';
+        // Helper to render locations (needs to run when entering Step 2 to catch updated state)
+        const renderLocations = () => {
+            locGrid.innerHTML = '';
 
-        // Count total businesses (active company + automated companies)
-        const totalBusinesses = (GameState.company ? 1 : 0) + (GameState.ownedCompanies ? GameState.ownedCompanies.length : 0);
-        const premiumLocationsUnlocked = totalBusinesses >= 2;
+            // Count total businesses
+            const totalBusinesses = (GameState.company ? 1 : 0) + (GameState.ownedCompanies ? GameState.ownedCompanies.length : 0);
+            const premiumLocationsUnlocked = totalBusinesses >= 2;
 
-        for (const [key, val] of Object.entries(CompanyModule.locations)) {
-            const trafficPct = Math.min(100, val.trafficMult * 80); // Visual bar
+            for (const [key, val] of Object.entries(CompanyModule.locations)) {
+                const trafficPct = Math.min(100, val.trafficMult * 80);
 
-            // PRE-CALCULATE DYNAMIC PRICE IF TYPE SELECTED
-            let priceDisplay = `x${val.rentMult}`;
-            let priceClass = '';
+                // PRE-CALCULATE DYNAMIC PRICE IF TYPE SELECTED
+                let priceDisplay = `x${val.rentMult}`;
 
-            if (state.typeId) {
-                const base = CompanyModule.businessTypes[state.typeId].baseRent;
-                const final = base * val.rentMult;
-                priceDisplay = formatCurrency(final) + '/mes';
-                priceClass = 'color: #fca5a5; font-weight:bold;'; // Light red for cost
-            }
+                if (state.typeId) {
+                    const base = CompanyModule.businessTypes[state.typeId].baseRent;
+                    const final = base * val.rentMult;
+                    priceDisplay = formatCurrency(final) + '/mes';
+                }
 
-            // Custom Requirement Logic
-            let isLocked = false;
-            let lockReason = '';
+                // Custom Requirement Logic
+                let isLocked = false;
+                let lockReason = '';
 
-            // 1. Check if Premium Location
-            const isPremium = (key === 'downtown' || key === 'business_district');
+                // 1. Check if Premium Location
+                const isPremium = (key === 'downtown' || key === 'business_district');
 
-            if (isPremium) {
-                // If Cafe, use specific progression: Suburbs -> Downtown -> Business
-                if (state.typeId === 'cafe') {
-                    const hasAutoOuter = (GameState.ownedCompanies || []).some(c => c.typeId === 'cafe' && c.locationId === 'suburbs');
-                    const hasAutoDowntown = (GameState.ownedCompanies || []).some(c => c.typeId === 'cafe' && c.locationId === 'downtown');
+                if (isPremium) {
+                    // If Cafe, use specific progression: Suburbs -> Downtown -> Business
+                    if (state.typeId === 'cafe') {
+                        const hasAutoOuter = (GameState.ownedCompanies || []).some(c => c.typeId === 'cafe' && c.locationId === 'suburbs');
+                        const hasAutoDowntown = (GameState.ownedCompanies || []).some(c => c.typeId === 'cafe' && c.locationId === 'downtown');
 
-                    if (key === 'downtown') {
-                        if (!hasAutoOuter) {
-                            isLocked = true;
-                            lockReason = 'Req: 1 Cafetería Automatizada en Afueras';
+                        if (key === 'downtown') {
+                            if (!hasAutoOuter) {
+                                isLocked = true;
+                                lockReason = 'Req: 1 Cafetería Automatizada en Afueras';
+                            }
+                        } else if (key === 'business_district') {
+                            if (!hasAutoDowntown) {
+                                isLocked = true;
+                                lockReason = 'Req: 1 Cafetería Automatizada en Centro';
+                            }
                         }
-                    } else if (key === 'business_district') {
-                        if (!hasAutoDowntown) {
+                    } else {
+                        // GENERIC FALLBACK (Old Logic)
+                        if (!premiumLocationsUnlocked) {
                             isLocked = true;
-                            lockReason = 'Req: 1 Cafetería Automatizada en Centro';
+                            lockReason = 'Req: 2+ Negocios Activos';
                         }
-                    }
-                } else {
-                    // GENERIC FALLBACK (Old Logic)
-                    if (!premiumLocationsUnlocked) {
-                        isLocked = true;
-                        lockReason = 'Req: 2+ Negocios Activos';
                     }
                 }
-            }
 
-            const card = document.createElement('div');
-            card.className = 'loc-tier-card';
-            if (isLocked) card.classList.add('locked');
+                const card = document.createElement('div');
+                card.className = 'loc-tier-card';
+                if (isLocked) card.classList.add('locked');
+                if (state.locId === key) card.classList.add('selected');
 
-            // Get location icon based on key
-            const getLocIcon = (locKey) => {
-                const icons = { 'suburbs': '🏡', 'residential': '🏘️', 'commercial': '🏪', 'downtown': '🌆', 'business_district': '🏙️' };
-                return icons[locKey] || '📍';
-            };
-            const locIcon = getLocIcon(key);
+                // Get location icon based on key
+                const getLocIcon = (locKey) => {
+                    const icons = { 'suburbs': '🏡', 'residential': '🏘️', 'commercial': '🏪', 'downtown': '🌆', 'business_district': '🏙️' };
+                    return icons[locKey] || '📍';
+                };
+                const locIcon = getLocIcon(key);
+                const trafficColor = val.trafficMult >= 1.5 ? '#4ade80' : val.trafficMult >= 1.0 ? '#fbbf24' : '#f87171';
 
-            // Traffic color based on multiplier
-            const trafficColor = val.trafficMult >= 1.5 ? '#4ade80' : val.trafficMult >= 1.0 ? '#fbbf24' : '#f87171';
-
-            card.innerHTML = `
+                card.innerHTML = `
                         <div style="text-align: center; margin-bottom: 15px;">
                             <div style="font-size: 2.5rem; margin-bottom: 10px; filter: ${isLocked ? 'grayscale(1)' : 'drop-shadow(0 0 10px rgba(56, 189, 248, 0.3))'};">${isLocked ? '🔒' : locIcon}</div>
                             <div style="font-size: 1.1rem; font-weight: 800; color: ${isLocked ? '#64748b' : '#fff'}; margin-bottom: 5px;">${val.name}</div>
                             ${isLocked ?
-                    '<span style="display: inline-block; background: rgba(251, 191, 36, 0.1); color: #fbbf24; padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; border: 1px solid rgba(251, 191, 36, 0.3);">🔒 Req: 2+ negocios</span>' :
-                    '<p style="color: #94a3b8; font-size: 0.8rem; margin: 0;">Ideal para negocios de volumen</p>'
-                }
+                        `<span style="display: inline-block; background: rgba(251, 191, 36, 0.1); color: #fbbf24; padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; border: 1px solid rgba(251, 191, 36, 0.3);">🔒 ${lockReason}</span>` :
+                        '<p style="color: #94a3b8; font-size: 0.8rem; margin: 0;">Ideal para negocios de volumen</p>'
+                    }
                         </div>
-                        <div style="display: grid; gap: 10px;">
-                            <div>
-                                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 5px;">
-                                    <span style="color: #94a3b8;">👥 Tráfico</span>
-                                    <span style="color: ${trafficColor}; font-weight: 700;">x${val.trafficMult}</span>
+                        <div style="margin-top: auto;">
+                            <div style="margin-bottom: 10px;">
+                                <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #94a3b8; margin-bottom: 4px;">
+                                    <span>Tráfico</span>
+                                    <span>${val.trafficMult}x</span>
                                 </div>
                                 <div style="background: #0f172a; border-radius: 6px; height: 8px; overflow: hidden;">
                                     <div style="width: ${trafficPct}%; height: 100%; background: linear-gradient(90deg, ${trafficColor}, ${trafficColor}99); border-radius: 6px;"></div>
@@ -3809,39 +3807,38 @@ var UI = {
                         </div>
                     `;
 
-
-            card.onclick = () => {
-                if (isLocked) {
-                    UI.showModal(
-                        '🔒 Ubicación Premium Bloqueada',
-                        `<div style="text-align:center;">
+                card.onclick = () => {
+                    if (isLocked) {
+                        UI.showModal(
+                            '🔒 Ubicación Premium Bloqueada',
+                            `<div style="text-align:center;">
                                     <p style="margin-bottom:15px;">Las ubicaciones <strong>${val.name}</strong> están reservadas para empresarios experimentados.</p>
                                     <div style="background:rgba(251, 191, 36, 0.1); border:1px solid #fbbf24; border-radius:8px; padding:15px; margin:15px 0;">
                                         <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
                                             <span>Requisito:</span>
-                                            <strong style="color:#fbbf24;">2+ Negocios</strong>
-                                        </div>
-                                        <div style="display:flex; justify-content:space-between;">
-                                            <span>Negocios Actuales:</span>
-                                            <strong style="color:#f87171;">${totalBusinesses}</strong>
+                                            <strong style="color:#fbbf24;">${lockReason.replace('Req:', '')}</strong>
                                         </div>
                                     </div>
                                     <p style="color:#94a3b8; font-size:0.9rem; margin-top:15px;">
                                         💡 Funda y automatiza tu primera empresa para desbloquear ubicaciones premium.
                                     </p>
                                 </div>`,
-                        [{ text: 'Entendido', style: 'secondary', fn: null }]
-                    );
-                    return;
-                }
+                            [{ text: 'Entendido', style: 'secondary', fn: null }]
+                        );
+                        return;
+                    }
 
-                locGrid.querySelectorAll('.loc-tier-card').forEach(el => el.classList.remove('selected'));
-                card.classList.add('selected');
-                state.locId = key;
-                updateSummary();
-            };
-            locGrid.appendChild(card);
-        }
+                    locGrid.querySelectorAll('.loc-tier-card').forEach(el => el.classList.remove('selected'));
+                    card.classList.add('selected');
+                    state.locId = key;
+                    updateSummary();
+                };
+                locGrid.appendChild(card);
+            }
+        };
+
+        // Initial render (Step 1 or 2 depending on currentStep)
+        if (currentStep === 2) renderLocations();
 
         // NAVIGATION LOGIC
         const showStep = (step) => {
@@ -3895,17 +3892,11 @@ var UI = {
                 btnNextMobile.onclick = finishWizard;
 
                 // UPDATE DYNAMIC RENT ON CARDS WHEN ENTERING STEP 2
-                if (state.typeId) {
-                    const base = CompanyModule.businessTypes[state.typeId].baseRent;
-                    locGrid.querySelectorAll('.loc-price-tag').forEach(tag => {
-                        const mult = parseFloat(tag.dataset.mult);
-                        tag.textContent = formatCurrency(base * mult) + '/mes';
-                        tag.style.color = '#fca5a5';
-                        tag.style.fontWeight = 'bold';
-                    });
-                }
+                // We re-render to ensure lock logic (which depends on typeId) is updated
+                renderLocations();
             }
         };
+
 
         const goNext = () => {
             state.name = nameInput.value;
