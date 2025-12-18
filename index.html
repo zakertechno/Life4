@@ -280,26 +280,6 @@
                     0 0 60px rgba(59, 130, 246, 0.2),
                     inset 0 0 20px rgba(147, 197, 253, 0.3);
                 transition: all 0.3s ease;
-                animation: neon-glow 1.5s ease-in-out infinite alternate;
-            }
-
-            @keyframes neon-glow {
-                from {
-                    box-shadow:
-                        0 0 15px rgba(59, 130, 246, 0.8),
-                        0 0 30px rgba(59, 130, 246, 0.6),
-                        0 0 45px rgba(59, 130, 246, 0.4),
-                        inset 0 0 20px rgba(147, 197, 253, 0.3);
-                }
-
-                to {
-                    box-shadow:
-                        0 0 20px rgba(96, 165, 250, 1),
-                        0 0 40px rgba(59, 130, 246, 0.8),
-                        0 0 60px rgba(37, 99, 235, 0.6),
-                        0 0 80px rgba(29, 78, 216, 0.4),
-                        inset 0 0 25px rgba(147, 197, 253, 0.4);
-                }
             }
 
             #next-turn-btn:hover {
@@ -355,58 +335,99 @@
                 margin-top: 2px;
             }
 
-            /* Mobile - Same layout, just smaller */
+            /* Mobile - 2 ROWS using CSS Grid */
             @media (max-width: 768px) {
                 .app-header {
-                    grid-template-columns: auto 1fr auto;
-                    gap: 8px;
-                    padding: 8px 10px;
+                    display: grid !important;
+                    grid-template-columns: 1fr 1fr 1fr !important;
+                    grid-template-rows: auto auto !important;
+                    gap: 8px !important;
+                    padding: 8px 12px !important;
                 }
 
+                /* Row 1: [🏠] [💰] [💾] */
                 .header-left {
-                    gap: 4px;
+                    grid-column: 1 / 2 !important;
+                    grid-row: 1 !important;
+                    display: flex !important;
+                    flex-direction: row !important;
+                    justify-content: flex-start !important;
+                    align-items: center !important;
                 }
 
-                .save-btn {
-                    padding: 5px 10px;
-                    font-size: 0.7rem;
+                .header-left .save-btn {
+                    display: none !important;
                 }
 
-                .save-btn span:last-child {
-                    display: none;
+                .header-right {
+                    grid-column: 2 / 3 !important;
+                    grid-row: 1 !important;
+                    display: flex !important;
+                    justify-content: center !important;
+                }
+
+                /* Create a pseudo save button on the right */
+                .app-header::after {
+                    content: '💾';
+                    grid-column: 3 / 4 !important;
+                    grid-row: 1 !important;
+                    display: flex !important;
+                    justify-content: flex-end !important;
+                    align-items: center !important;
+                    background: linear-gradient(135deg, #10b981, #059669);
+                    color: white;
+                    padding: 6px 10px;
+                    border-radius: 15px;
+                    font-size: 0.9rem;
+                    cursor: pointer;
+                    width: fit-content;
+                    margin-left: auto;
+                }
+
+                /* Row 2: Button full width centered */
+                .header-center {
+                    grid-column: 1 / 4 !important;
+                    grid-row: 2 !important;
+                    display: flex !important;
+                    justify-content: center !important;
                 }
 
                 .home-btn {
-                    padding: 5px 10px;
+                    padding: 6px 10px !important;
+                }
+
+                .home-btn::before {
+                    display: none !important;
                 }
 
                 .home-icon {
-                    font-size: 1rem;
+                    font-size: 1rem !important;
                 }
 
                 #header-player-name {
-                    display: none;
+                    display: none !important;
                 }
 
                 #next-turn-btn {
-                    padding: 10px 20px;
-                    font-size: 0.85rem;
+                    padding: 12px 30px !important;
+                    font-size: 0.8rem !important;
+                    box-shadow: 0 0 15px rgba(59, 130, 246, 0.6) !important;
                 }
 
                 .money-card {
-                    padding: 5px 10px;
+                    padding: 5px 10px !important;
                 }
 
                 .money-icon {
-                    font-size: 1rem;
+                    font-size: 1rem !important;
                 }
 
                 #money-display {
-                    font-size: 1rem;
+                    font-size: 0.9rem !important;
                 }
 
                 #date-display {
-                    font-size: 0.6rem;
+                    font-size: 0.55rem !important;
                 }
             }
         </style>
