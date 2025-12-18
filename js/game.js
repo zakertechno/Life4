@@ -1636,9 +1636,10 @@ var CompanyModule = {
 
         GameState.company = null;
         GameState.jobTitle = 'Magnate (Sin empresa activa)';
+        GameState.salary = 0; // FIX: Stop paying CEO salary when automated
         JobSystem.currentCareerPath = 'none';
 
-        return { success: true, message: `¡${co.name} automatizada! Beneficio Base: ${formatCurrency(co.baselineProfit)}/mes.` };
+        return { success: true, message: `¡Empresa automatizada! ${co.name} ahora genera ingresos pasivos.` };
     },
 
     setStrategicOption(category, value) {
@@ -4768,25 +4769,64 @@ var UI = {
             // --- SHARED: HOLDING LIST (MANAGED COMPANIES) ---
             if (GameState.ownedCompanies && GameState.ownedCompanies.length > 0) {
                 const holdingSection = document.createElement('div');
-                holdingSection.className = 'dashboard-card full-width mb-30';
-                holdingSection.innerHTML = `<h3 style="color:#facc15; margin-bottom:15px; display:flex; align-items:center; gap:10px;">👑 Holding Empresarial</h3>`;
+                holdingSection.style.marginBottom = '30px';
+
+                // PREMIUM HEADER
+                holdingSection.innerHTML = `
+                    <div style="background: linear-gradient(90deg, #1e293b, transparent); border-left: 4px solid #f59e0b; padding: 10px 15px; margin-bottom: 15px; border-radius: 0 8px 8px 0;">
+                        <h3 style="margin:0; font-size: 1.2rem; color: #fbbf24; font-weight:800; display:flex; align-items:center; gap:8px;">
+                            👑 Holding Empresarial <span style="font-size:0.8rem; color:#94a3b8; font-weight:400; margin-left:auto;">${GameState.ownedCompanies.length} Activos</span>
+                        </h3>
+                    </div>
+                `;
+
                 const holdingList = document.createElement('div');
+                holdingList.className = 'holding-grid';
+                // We'll trust CSS or inline styles for grid. 
+                // Let's use inline styles to be safe without touching CSS file yet, or add class.
                 holdingList.style.display = 'grid';
-                holdingList.style.gap = '10px';
+                holdingList.style.gridTemplateColumns = 'repeat(auto-fill, minmax(300px, 1fr))';
+                holdingList.style.gap = '15px';
 
                 GameState.ownedCompanies.forEach((co, idx) => {
                     const div = document.createElement('div');
-                    div.className = 'holding-item-row';
+                    div.style.background = 'linear-gradient(145deg, #1e293b, #0f172a)';
+                    div.style.border = '1px solid rgba(251, 191, 36, 0.2)';
+                    div.style.borderRadius = '16px';
+                    div.style.padding = '20px';
+                    div.style.position = 'relative';
+                    div.style.overflow = 'hidden';
+                    div.style.transition = 'transform 0.2s';
+                    div.onmouseover = () => div.style.transform = 'translateY(-3px)';
+                    div.onmouseout = () => div.style.transform = 'translateY(0)';
+
                     div.innerHTML = `
-                            <div class="holding-info">
-                                <span class="co-name">${co.name}</span>
-                                <span class="co-details">${co.typeName} | ${co.locationName}</span>
+                        <!-- Absolute Decorative Line -->
+                         <div style="position: absolute; top:0; left:0; right:0; height:3px; background: linear-gradient(90deg, #fbbf24, #f59e0b);"></div>
+                        
+                        <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:15px;">
+                            <div>
+                                <h4 style="margin:0; color:#fff; font-size:1.1rem; font-weight:700;">${co.name}</h4>
+                                <div style="font-size:0.8rem; color:#94a3b8;">${co.typeName} • ${co.locationName}</div>
                             </div>
-                            <div class="holding-stats">
-                                <span class="co-profit">+${formatCurrency(co.baselineProfit)}/mes</span>
-                                <button class="btn-sell-passive" data-idx="${idx}">VENDER</button>
-                            </div>
-                        `;
+                            <div style="background:rgba(251, 191, 36, 0.1); color:#fbbf24; padding:4px 8px; border-radius:6px; font-size:0.75rem; font-weight:700;">PASSIVE</div>
+                        </div>
+
+                        <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.3); padding:10px; border-radius:10px;">
+                            <div style="font-size:0.8rem; color:#94a3b8;">Beneficio Mensual</div>
+                            <div style="font-size:1.1rem; color:#4ade80; font-weight:800;">+${formatCurrency(co.baselineProfit)}</div>
+                        </div>
+
+                        <div style="margin-top:15px; display:flex; justify-content:flex-end;">
+                             <button class="btn-sell-passive" data-idx="${idx}" style="background:transparent; border:1px solid #ef4444; color:#ef4444; padding:6px 14px; border-radius:8px; font-size:0.8rem; cursor:pointer; transition:all 0.2s; font-weight:600;">
+                                💸 Vender Activo
+                             </button>
+                        </div>
+                    `;
+
+                    const btnSell = div.querySelector('.btn-sell-passive');
+                    btnSell.onmouseover = () => { btnSell.style.background = '#ef4444'; btnSell.style.color = 'white'; };
+                    btnSell.onmouseout = () => { btnSell.style.background = 'transparent'; btnSell.style.color = '#ef4444'; };
                     div.querySelector('.btn-sell-passive').onclick = () => {
                         UI.confirmModal('Vender Empresa', `¿Seguro que quieres vender ${co.name}?\n\nValoración: 5x Beneficio anual.`, () => {
                             const res = CompanyModule.sellPassiveCompany(idx);
