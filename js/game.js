@@ -4179,17 +4179,22 @@ var UI = {
         const current = GameState.lifestyle;
         let totalCost = LifestyleModule.calculateTotal();
 
-        // HERO
+        // HERO - Premium Design
         const heroHTML = `
-                    <div class="edu-hero" style="background:linear-gradient(135deg, #ec4899, #db2777);">
-                        <div class="edu-icon">💸</div>
-                        <div>
-                            <h2 style="margin:0; font-size:1.5rem;">Estilo de Vida</h2>
-                            <p style="color:#fbcfe8; margin:5px 0;">Gastos Mensuales: <strong>${formatCurrency(totalCost)}</strong></p>
-                            <p style="font-size:0.9rem; opacity:0.8;">Tu nivel de vida define tus gastos fijos.</p>
+                    <div class="lifestyle-hero" style="background: linear-gradient(145deg, rgba(236, 72, 153, 0.15), rgba(219, 39, 119, 0.05)); border: 1px solid rgba(236, 72, 153, 0.3); border-radius: 20px; padding: 25px; position: relative; overflow: hidden;">
+                        <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #ec4899, #db2777);"></div>
+                        <div style="display: flex; align-items: center; gap: 20px;">
+                            <div style="font-size: 3.5rem; filter: drop-shadow(0 0 15px rgba(236, 72, 153, 0.5));">💸</div>
+                            <div style="flex: 1;">
+                                <span style="display: inline-block; background: linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(219, 39, 119, 0.1)); color: #ec4899; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; border: 1px solid rgba(236, 72, 153, 0.3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;">Estilo de Vida</span>
+                                <p style="margin: 0 0 5px 0; font-size: 0.85rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Gastos Mensuales</p>
+                                <h2 style="margin: 0 0 12px 0; font-size: 1.6rem; color: #ec4899; font-weight: 800;">${formatCurrency(totalCost)}</h2>
+                                <p style="color: #94a3b8; margin: 0; font-size: 0.9rem;">💡 Tu nivel de vida define tus gastos fijos.</p>
+                            </div>
                         </div>
                     </div>
                     `;
+
 
         // CATEGORIES
         const categoriesHTML = Object.keys(LifestyleModule.categories).map(catKey => {
@@ -4232,26 +4237,50 @@ var UI = {
                     cardClasses += ' tutorial-highlight';
                 }
 
+                // Get icon based on item
+                const getItemIcon = (itemId) => {
+                    const icons = {
+                        'parents': '🏠', 'sofa': '🛋️', 'piso_compartido': '🏢', 'piso_alquiler': '🏬', 'piso_propio': '🏡',
+                        'comida_basica': '🍞', 'comida_normal': '🍝', 'comida_premium': '🍣', 'comida_lujo': '🥂',
+                        'transporte_publico': '🚌', 'moto': '🏍️', 'coche_basico': '🚗', 'coche_premium': '🚙', 'coche_lujo': '🏎️'
+                    };
+                    return icons[itemId] || '📦';
+                };
+                const itemIcon = getItemIcon(item.id);
+
                 return `
-                            <div class="${cardClasses}" style="${cardStyle}" data-cat="${catKey}" data-id="${item.id}" ${isDisabled ? 'data-disabled="true"' : ''}>
-                                <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                                    <h4 style="margin:0; color:${isSelected ? '#ec4899' : '#fff'}">${item.name}</h4>
-                                    <span style="font-weight:bold;">${formatCurrency(item.cost)}</span>
+                            <div class="${cardClasses}" style="${cardStyle}; border-radius: 12px; padding: 15px; transition: all 0.2s;" data-cat="${catKey}" data-id="${item.id}" ${isDisabled ? 'data-disabled="true"' : ''}>
+                                <div style="display:flex; justify-content:space-between; align-items: center; margin-bottom:8px;">
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <span style="font-size: 1.5rem;">${itemIcon}</span>
+                                        <h4 style="margin:0; color:${isSelected ? '#ec4899' : '#fff'}; font-weight: 700;">${item.name}</h4>
+                                    </div>
+                                    <span style="font-weight: 800; color: ${isSelected ? '#ec4899' : '#f59e0b'}; font-size: 1.1rem;">${formatCurrency(item.cost)}</span>
                                 </div>
-                                <p style="font-size:0.8rem; color:#94a3b8; margin:0;">${item.desc}</p>
+                                <p style="font-size:0.85rem; color:#94a3b8; margin:0; padding-left: 42px;">${item.desc}</p>
+                                ${isSelected ? '<div style="margin-top: 10px; padding-left: 42px;"><span style="background: linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(219, 39, 119, 0.1)); color: #ec4899; padding: 3px 10px; border-radius: 12px; font-size: 0.7rem; font-weight: 700; border: 1px solid rgba(236, 72, 153, 0.3);">✓ SELECCIONADO</span></div>' : ''}
                             </div>
                             `;
             }).join('');
 
+            // Category icons
+            const getCatIcon = (key) => {
+                const icons = { 'housing': '🏠', 'food': '🍽️', 'transport': '🚗' };
+                return icons[key] || '📋';
+            };
+
             return `
-                        <div style="margin-bottom:25px;">
-                            <h3 style="color:#cbd5e1; border-bottom:1px solid #334155; padding-bottom:5px; margin-bottom:15px;">${cat.label}</h3>
+                        <div style="margin-bottom:30px;">
+                            <h3 style="color:#cbd5e1; border-bottom:2px solid rgba(236, 72, 153, 0.3); padding-bottom:10px; margin-bottom:20px; display: flex; align-items: center; gap: 10px; font-size: 1.1rem;">
+                                <span style="font-size: 1.3rem;">${getCatIcon(catKey)}</span> ${cat.label}
+                            </h3>
                             <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:15px;">
                                 ${itemsHTML}
                             </div>
                         </div>
                         `;
         }).join('');
+
 
         container.innerHTML = `
                         <div class="dashboard-container">
@@ -4330,31 +4359,59 @@ var UI = {
         if (current) {
             const progress = ((current.duration - current.remainingMonths) / current.duration) * 100;
             heroHTML = `
-                    <div class="edu-hero">
-                        <div class="edu-icon">📚</div>
-                        <div class="edu-progress-container">
-                            <h2 style="margin:0; font-size:1.5rem;">Estudiando: ${current.name}</h2>
-                            <p style="color:#e2e8f0; margin:5px 0;">Tiempo Restante: ${current.remainingMonths} meses</p>
-                            <div class="edu-bar-bg">
-                                <div class="edu-bar-fill" style="width:${progress}%"></div>
+                    <div class="edu-hero" style="background: linear-gradient(145deg, rgba(168, 85, 247, 0.15), rgba(139, 92, 246, 0.05)); border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 20px; padding: 25px; position: relative; overflow: hidden;">
+                        <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #a855f7, #8b5cf6);"></div>
+                        <div style="display: flex; align-items: center; gap: 20px;">
+                            <div style="font-size: 3.5rem; filter: drop-shadow(0 0 15px rgba(168, 85, 247, 0.5));">📚</div>
+                            <div style="flex: 1;">
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                                    <span style="background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(139, 92, 246, 0.1)); color: #a855f7; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; border: 1px solid rgba(168, 85, 247, 0.3); text-transform: uppercase; letter-spacing: 1px;">En Curso</span>
+                                </div>
+                                <h2 style="margin: 0 0 8px 0; font-size: 1.4rem; color: #fff; font-weight: 800;">${current.name}</h2>
+                                <p style="color: #94a3b8; margin: 0 0 15px 0; font-size: 0.9rem;">⏱️ Tiempo restante: <span style="color: #a855f7; font-weight: 700;">${current.remainingMonths} meses</span></p>
+                                <div style="background: #1e293b; border-radius: 8px; height: 12px; overflow: hidden;">
+                                    <div style="width: ${progress}%; height: 100%; background: linear-gradient(90deg, #a855f7, #8b5cf6); border-radius: 8px; transition: width 0.3s;"></div>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-top: 8px; font-size: 0.8rem; color: #64748b;">
+                                    <span>Progreso</span>
+                                    <span style="color: #a855f7; font-weight: 700;">${progress.toFixed(0)}%</span>
+                                </div>
                             </div>
                         </div>
                     </div>
                     `;
+
         } else {
             const highestId = myEdu[myEdu.length - 1];
             const highest = highestId ? UI.getLabel(highestId) : 'Sin Estudios';
+
+            // Get education icon based on level
+            const getEduIcon = (eduId) => {
+                const icons = {
+                    'eso': '📖', 'bach': '📕', 'fp_medio': '🔧', 'fp_superior': '⚙️',
+                    'grado': '🎓', 'master': '👨‍🎓', 'doctorado': '🏆'
+                };
+                return icons[eduId] || '🎓';
+            };
+            const eduIcon = getEduIcon(highestId);
+
             heroHTML = `
-                    <div class="edu-hero" style="background:linear-gradient(135deg, #3b82f6, #2563eb);">
-                        <div class="edu-icon">🎓</div>
-                        <div>
-                            <h2 style="margin:0; font-size:1.5rem;">Formación Actual</h2>
-                            <p style="color:#e2e8f0; margin:5px 0;">Máximo Grado: <strong>${highest}</strong></p>
-                            <p style="font-size:0.9rem; opacity:0.8;">Inscríbete en un curso para mejorar tus perspectivas laborales.</p>
+                    <div class="edu-hero" style="background: linear-gradient(145deg, rgba(168, 85, 247, 0.1), rgba(139, 92, 246, 0.05)); border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 20px; padding: 25px; position: relative; overflow: hidden;">
+                        <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #a855f7, #8b5cf6);"></div>
+                        <div style="display: flex; align-items: center; gap: 20px;">
+                            <div style="font-size: 3.5rem; filter: drop-shadow(0 0 15px rgba(168, 85, 247, 0.5));">${eduIcon}</div>
+                            <div style="flex: 1;">
+                                <span style="display: inline-block; background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(139, 92, 246, 0.1)); color: #a855f7; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; border: 1px solid rgba(168, 85, 247, 0.3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;">Formación Actual</span>
+                                <p style="margin: 0 0 5px 0; font-size: 0.85rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Máximo Grado</p>
+                                <h2 style="margin: 0 0 12px 0; font-size: 1.6rem; color: #a855f7; font-weight: 800;">${highest}</h2>
+
+                                <p style="color: #94a3b8; margin: 0; font-size: 0.9rem;">💡 Inscríbete en un curso para mejorar tus perspectivas laborales.</p>
+                            </div>
                         </div>
                     </div>
                     `;
         }
+
 
         // GRID CONTENT
         const available = [];
