@@ -5095,6 +5095,8 @@
             -webkit-appearance: none;
             appearance: none;
             touch-action: manipulation;
+            white-space: nowrap;
+            /* Prevent text wrapping */
         }
 
         @media (hover: hover) {
