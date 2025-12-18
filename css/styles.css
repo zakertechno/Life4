@@ -4143,12 +4143,6 @@
                 display: flex !important;
                 justify-content: center !important;
             }
-
-            .app-header #next-turn-btn {
-                padding: 12px 30px !important;
-                font-size: 0.8rem !important;
-                box-shadow: 0 0 15px rgba(59, 130, 246, 0.6) !important;
-            }
         }
 
         /* =====================================================
