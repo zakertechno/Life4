@@ -3589,14 +3589,19 @@ var UI = {
             const riskTag = volatility > 0.3 ? '<span class="biz-tag tag-high-risk">Alto Riesgo</span>' : '<span class="biz-tag tag-low-risk">Estable</span>';
             const icon = val.icon || '🏢';
 
-            // Check Lock Condition
+            // Check Lock Condition (Existing logic for cafe count)
             const isLocked = (key !== 'cafe' && cafeCount < 2);
 
+            // Check Funds Condition
+            const canAfford = GameState.cash >= val.cost;
+            const isAffordable = canAfford || isLocked; // If locked, affordability doesn't matter for the "locked" state display, but for clarity let's treat insufficient funds as a separate state if not locked.
+
             const card = document.createElement('div');
-            card.className = `biz-model-card ${isLocked ? 'locked' : ''}`;
+            // Add 'locked' class if either condition is met
+            card.className = `biz-model-card ${isLocked || !canAfford ? 'locked' : ''}`;
 
             if (isLocked) {
-                // Locked Card Stlyes are handled by CSS .biz-model-card.locked
+                // ... Existing Locked Logic ...
                 card.innerHTML = `
                             <div style="text-align: center;">
                                 <div style="font-size: 2.5rem; margin-bottom: 10px; filter: grayscale(1);">🔒</div>
@@ -3606,6 +3611,21 @@ var UI = {
                             <div style="margin-top: 15px; padding: 12px; background: rgba(248, 113, 113, 0.1); border-radius: 10px; border: 1px solid rgba(248, 113, 113, 0.2); text-align: center;">
                                 <div style="font-size: 0.85rem; color: #f87171;">⚠️ Requiere 2 Cafeterías</div>
                                 <div style="font-size: 0.8rem; color: #94a3b8; margin-top: 4px;">Tienes: <strong style="color: #fbbf24;">${cafeCount}</strong></div>
+                            </div>
+                        `;
+
+            } else if (!canAfford) {
+                // INSUFFICIENT FUNDS STATE
+                card.innerHTML = `
+                            <div style="text-align: center;">
+                                <div style="font-size: 2.5rem; margin-bottom: 10px; opacity: 0.5;">${icon}</div>
+                                <div style="font-size: 1.1rem; font-weight: 700; color: #64748b; margin-bottom: 8px;">${val.name}</div>
+                                <span style="display: inline-block; background: rgba(239, 68, 68, 0.1); color: #ef4444; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; border: 1px solid rgba(239, 68, 68, 0.2);">Fondos Insuficientes</span>
+                            </div>
+                            <div style="margin-top: 15px; padding: 12px; background: rgba(15, 23, 42, 0.3); border-radius: 10px; border: 1px dashed #475569; text-align: center;">
+                                <div style="font-size: 0.85rem; color: #94a3b8;">Coste de Inversión</div>
+                                <div style="font-size: 1.1rem; font-weight: 800; color: #ef4444; margin-top: 4px;">${formatCurrency(val.cost)}</div>
+                                <div style="font-size: 0.8rem; color: #64748b; margin-top: 2px;">Tienes: <span style="${GameState.cash < val.cost ? 'color:#ef4444' : 'color:#4ade80'}">${formatCurrency(GameState.cash)}</span></div>
                             </div>
                         `;
 
@@ -5306,6 +5326,7 @@ var UI = {
                 contentContainer.appendChild(marketSection);
 
                 // 4. Entrepreneur Footer - Premium Design
+                const enoughNetWorth = GameState.netWorth >= 25000;
                 const entrepreneurSection = document.createElement('div');
                 entrepreneurSection.className = 'entrepreneur-footer';
                 entrepreneurSection.innerHTML = `
@@ -5316,15 +5337,20 @@ var UI = {
                                     <div style="font-size: 2.5rem; margin-bottom: 10px; filter: drop-shadow(0 0 15px rgba(251, 191, 36, 0.5));">🚀</div>
                                     <h3 style="margin: 0 0 8px 0; font-size: 1.3rem; color: #fbbf24; font-weight: 800;">¿Listo para dar el gran salto?</h3>
                                     <p style="color: #94a3b8; margin: 0; font-size: 0.9rem;">Deja tu empleo y construye tu propio legado empresarial.</p>
+                                    ${!enoughNetWorth ? `<p style="color: #f87171; margin-top: 8px; font-weight: bold; font-size: 0.9rem;">⚠️ Requisito: 25.000€ Patrimonio (Tienes: ${formatCurrency(GameState.netWorth)})</p>` : ''}
                                 </div>
-                                <button id="btn-found-company" style="background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #0f172a; border: none; padding: 16px 40px; border-radius: 12px; font-weight: 900; font-size: 1rem; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 0 #b45309, 0 8px 20px rgba(251, 191, 36, 0.3); transition: all 0.15s;">
-                                    🏢 FUNDAR EMPRESA
+                                <button id="btn-found-company" ${!enoughNetWorth ? 'disabled' : ''} style="background: ${enoughNetWorth ? 'linear-gradient(135deg, #fbbf24, #f59e0b)' : '#334155'}; color: ${enoughNetWorth ? '#0f172a' : '#94a3b8'}; border: none; padding: 16px 40px; border-radius: 12px; font-weight: 900; font-size: 1rem; cursor: ${enoughNetWorth ? 'pointer' : 'not-allowed'}; text-transform: uppercase; letter-spacing: 1px; box-shadow: ${enoughNetWorth ? '0 4px 0 #b45309, 0 8px 20px rgba(251, 191, 36, 0.3)' : 'none'}; transition: all 0.15s; opacity: ${enoughNetWorth ? '1' : '0.6'};">
+                                    ${enoughNetWorth ? '🏢 FUNDAR EMPRESA' : '🔒 PATRIMONIO INSUFICIENTE'}
                                 </button>
                             </div>
                         </div>
                     `;
 
-                entrepreneurSection.querySelector('#btn-found-company').onclick = () => UI.openCompanyWizard();
+                if (enoughNetWorth) {
+                    entrepreneurSection.querySelector('#btn-found-company').onclick = () => UI.openCompanyWizard();
+                } else {
+                    entrepreneurSection.querySelector('#btn-found-company').onclick = () => alert('Necesitas un patrimonio neto de al menos 25.000€ para asumir el riesgo de fundar una empresa.');
+                }
                 contentContainer.appendChild(entrepreneurSection);
             } else {
                 // --- COMPANY OWNER MODE ---
@@ -5349,13 +5375,28 @@ var UI = {
                                             <div style="font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">💵 Caja</div>
                                             <div style="font-size: 1.2rem; font-weight: 800; color: #4ade80;">${formatCurrency(co.cash)}</div>
                                         </div>
-                                        <div style="background: linear-gradient(145deg, ${co.profitLastMonth >= 0 ? 'rgba(74, 222, 128, 0.1)' : 'rgba(248, 113, 113, 0.1)'}, transparent); padding: 12px 18px; border-radius: 12px; border: 1px solid ${co.profitLastMonth >= 0 ? 'rgba(74, 222, 128, 0.3)' : 'rgba(248, 113, 113, 0.3)'}; text-align: center; min-width: 100px;">
+                                    <div style="background: linear-gradient(145deg, ${co.profitLastMonth >= 0 ? 'rgba(74, 222, 128, 0.1)' : 'rgba(248, 113, 113, 0.1)'}, transparent); padding: 12px 18px; border-radius: 12px; border: 1px solid ${co.profitLastMonth >= 0 ? 'rgba(74, 222, 128, 0.3)' : 'rgba(248, 113, 113, 0.3)'}; text-align: center; min-width: 100px;">
                                             <div style="font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">📈 Beneficio</div>
                                             <div style="font-size: 1.2rem; font-weight: 800; color: ${co.profitLastMonth >= 0 ? '#4ade80' : '#f87171'};">${co.profitLastMonth >= 0 ? '+' : ''}${formatCurrency(co.profitLastMonth)}</div>
                                         </div>
-                                        <button id="btn-automate" style="background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #0f172a; border: none; padding: 12px 20px; border-radius: 10px; font-weight: 800; font-size: 0.8rem; cursor: pointer; box-shadow: 0 3px 0 #b45309; transition: all 0.15s;">
-                                            🤖 Automatizar
-                                        </button>
+                                        ${(() => {
+                        const autoCost = Math.max(30000, (co.profitLastMonth || 0) * 3);
+                        const hasStaff = co.staff.length >= 15;
+                        const hasMoney = co.cash >= autoCost;
+
+                        const canAffordAuto = hasMoney && hasStaff;
+
+                        let reqText = '';
+                        if (!hasStaff) reqText = `Req: 15 Empleados (${co.staff.length}/15)`;
+                        else if (!hasMoney) reqText = `Req: ${formatCurrency(autoCost)} (Caja: ${formatCurrency(co.cash)})`;
+
+                        return `
+                                            <button id="btn-automate" ${!canAffordAuto ? 'disabled' : ''} style="background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #0f172a; border: none; padding: 12px 20px; border-radius: 10px; font-weight: 800; font-size: 0.8rem; cursor: ${canAffordAuto ? 'pointer' : 'not-allowed'}; box-shadow: 0 3px 0 #b45309; transition: all 0.15s; opacity: ${canAffordAuto ? '1' : '0.8'}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;">
+                                                <span>🤖 Automatizar</span>
+                                                ${!canAffordAuto ? `<span style="font-size:0.65rem; color:#78350f; font-weight:700;">${reqText}</span>` : ''}
+                                            </button>
+                                            `;
+                    })()}
                                     </div>
                                 </div>
                             </div>

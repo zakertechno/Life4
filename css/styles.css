@@ -4173,6 +4173,8 @@
             height: auto;
             max-height: 90vh;
             min-height: 500px;
+            margin: 0 auto;
+            /* Force Centering on Desktop */
             padding: 0;
             overflow: hidden;
             display: flex;
