@@ -5071,7 +5071,8 @@
         }
 
         /* PREMIUM 3D BUTTONS */
-        #next-turn-btn {
+        #next-turn-btn,
+        .btn-premium-3d {
             background: linear-gradient(135deg, #22c55e, #16a34a);
             color: white;
             border: none;
@@ -5089,7 +5090,28 @@
             overflow: hidden;
         }
 
-        #next-turn-btn::after {
+        @media (hover: hover) {
+
+            #next-turn-btn:hover,
+            .btn-premium-3d:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 0 #15803d, 0 12px 20px rgba(34, 197, 94, 0.5);
+            }
+
+            #next-turn-btn:hover::after,
+            .btn-premium-3d:hover::after {
+                opacity: 1;
+            }
+        }
+
+        #next-turn-btn:active,
+        .btn-premium-3d:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #15803d, 0 4px 10px rgba(34, 197, 94, 0.3);
+        }
+
+        #next-turn-btn::after,
+        .btn-premium-3d::after {
             content: '';
             position: absolute;
             top: 0;

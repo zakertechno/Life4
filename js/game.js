@@ -6423,12 +6423,8 @@ try {
     console.log('Juego iniciado (Script Try Block Start)');
     const setupEventListeners = () => {
         // Next Turn Buttons (Header and Dashboard)
-        const nextBtns = document.querySelectorAll('#next-turn-btn, button[onclick*="nextTurn"]');
-        // Since ID should be unique, I'll select by ID and maybe the dashboard one needs a class? 
-        // For now, I'll select all buttons with text 'Siguiente Mes' or similar if IDs are messy, 
-        // but usually I can just getById if unique. 
-        // Found duplicate IDs in valid HTML check. I will queryAll by ID [id="next-turn-btn"]
-        document.querySelectorAll('[id="next-turn-btn"]').forEach(btn => {
+        const nextBtns = document.querySelectorAll('#next-turn-btn, #dashboard-next-btn');
+        nextBtns.forEach(btn => {
             btn.onclick = () => {
                 const prevCash = GameState.cash;
                 nextTurn();
