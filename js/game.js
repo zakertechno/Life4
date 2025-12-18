@@ -1568,7 +1568,7 @@ var CompanyModule = {
         return { success: true, message: `Has fundado ${name}.` };
     },
 
-    hireStaff(role, salary, skill) {
+    hireStaff(role, salary, skill, name) {
         if (!GameState.company) return;
         const co = GameState.company;
 
@@ -1577,13 +1577,14 @@ var CompanyModule = {
         }
 
         co.staff.push({
+            name: name || role,
             role: role,
             salary: salary,
             startWage: salary,
             skill: skill || 0.5,
             morale: 0.8
         });
-        return { success: true, message: `Contratado: ${role}` };
+        return { success: true, message: `¡${name || role} contratado!` };
     },
 
     fireStaff(index) {
@@ -5765,10 +5766,9 @@ var UI = {
                                 <div class="staff-card">
                                     <div class="staff-header-row">
                                         <div>
-                                            <h4 class="staff-role-title">${emp.role}</h4>
-                                            <div class="staff-meta">Contratado: Sem. ${emp.hiredWeek || '?'}</div>
+                                            <h4 class="staff-role-title">${emp.name || emp.role}</h4>
+                                            <div class="staff-meta" style="color:#64748b; font-size:0.75rem;">${emp.role}</div>
                                         </div>
-                                        <button onclick="fireEmployee(${i})" class="btn-fire-sm">Despedir</button>
                                     </div>
                                     
                                     <div class="staff-stat-row">
@@ -5814,6 +5814,14 @@ var UI = {
                                             </label>
                                         </div>
                                     </div>
+                                    
+                                    <button 
+                                        onclick="fireEmployee(${i})" 
+                                        class="btn-fire-sm" 
+                                        style="width: 100%; margin-top: 12px; padding: 8px 12px; border-radius: 8px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; font-size: 0.8rem; cursor: pointer; transition: all 0.2s;"
+                                        onmouseover="this.style.background='rgba(239, 68, 68, 0.25)'"
+                                        onmouseout="this.style.background='rgba(239, 68, 68, 0.15)'"
+                                    >🚪 Despedir</button>
                                 </div>
                             `;
                     });
@@ -5881,15 +5889,72 @@ var UI = {
                             return;
                         }
                         const skill = role === 'Experto' ? 0.8 : 0.4;
-                        const r = CompanyModule.hireStaff(role, sal, skill);
-                        if (r) {
-                            if (!r.success) {
-                                UI.showModal('❌ Error al Contratar', r.message, [
-                                    { text: 'Cerrar', style: 'secondary', fn: null }
-                                ]);
+
+                        // Show styled modal for employee name input
+                        const nameInputHtml = `
+                            <div style="text-align: center;">
+                                <div style="font-size: 3rem; margin-bottom: 15px;">👤</div>
+                                <p style="color: #94a3b8; margin-bottom: 20px;">
+                                    Dale un nombre a tu nuevo <strong style="color: #38bdf8;">${role}</strong>
+                                </p>
+                                <input 
+                                    type="text" 
+                                    id="new-employee-name" 
+                                    maxlength="10" 
+                                    placeholder="Ej: María, Juan..."
+                                    style="
+                                        width: 100%;
+                                        padding: 12px 16px;
+                                        font-size: 1.1rem;
+                                        font-weight: 600;
+                                        text-align: center;
+                                        background: rgba(15, 23, 42, 0.8);
+                                        border: 2px solid rgba(56, 189, 248, 0.3);
+                                        border-radius: 12px;
+                                        color: #fff;
+                                        outline: none;
+                                        transition: border-color 0.2s;
+                                    "
+                                    onfocus="this.style.borderColor='#38bdf8'"
+                                    onblur="this.style.borderColor='rgba(56, 189, 248, 0.3)'"
+                                />
+                                <p style="color: #64748b; font-size: 0.75rem; margin-top: 8px;">Máximo 10 caracteres</p>
+                            </div>
+                        `;
+
+                        UI.showModal('✨ Nuevo Empleado', nameInputHtml, [
+                            {
+                                text: 'Cancelar',
+                                style: 'secondary',
+                                fn: null
+                            },
+                            {
+                                text: '¡Contratar!',
+                                style: 'success',
+                                fn: () => {
+                                    const nameInput = document.getElementById('new-employee-name');
+                                    let empName = (nameInput.value || '').trim().substring(0, 10) || role;
+
+                                    const r = CompanyModule.hireStaff(role, sal, skill, empName);
+                                    if (r) {
+                                        if (!r.success) {
+                                            UI.showModal('❌ Error al Contratar', r.message, [
+                                                { text: 'Cerrar', style: 'secondary', fn: null }
+                                            ]);
+                                        } else {
+                                            UI.showToast(`¡${empName} se une al equipo! 🎉`, 'success');
+                                        }
+                                        UI.updateJob(JobSystem);
+                                    }
+                                }
                             }
-                            UI.updateJob(JobSystem);
-                        }
+                        ]);
+
+                        // Focus input after modal renders
+                        setTimeout(() => {
+                            const inp = document.getElementById('new-employee-name');
+                            if (inp) inp.focus();
+                        }, 100);
                     };
                     window.fireEmployee = (i) => {
                         if (confirm('¿Despedir empleado? Baja moral del equipo.')) {
